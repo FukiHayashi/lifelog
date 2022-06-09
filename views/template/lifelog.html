@@ -1,4 +1,12 @@
-<div>
-    <img class="avatar" src="{{ .picture }}"/>
-    <h2>Welcome {{.nickname}}</h2>
-</div>
+<html>
+    <head>
+        <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+        <script src="assets/javascripts/user.js"></script>
+    </head>
+    <div>
+        <img class="avatar" src="{{ .picture }}"/>
+        <h2>Welcome {{.nickname}}</h2>
+        <button class="btn-logout">logout</button>
+    </div>
+</html>

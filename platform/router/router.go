@@ -2,6 +2,7 @@ package router
 
 import (
 	"encoding/gob"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
@@ -11,6 +12,7 @@ import (
 	"lifelog/controllers/callback"
 	"lifelog/controllers/lifelog"
 	"lifelog/controllers/login"
+	"lifelog/controllers/logout"
 	"lifelog/platform/authenticator"
 )
 
@@ -25,6 +27,7 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 
 	// HTMLテンプレートパス設定
 	router.LoadHTMLGlob("views/template/*")
+	router.Static("./assets", "./assets")
 
 	// 無名ハンドラ
 	router.GET("/", func(ctx *gin.Context) {
@@ -34,8 +37,29 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 	router.GET("/login", login.Handler(auth))
 	// コールバックハンドラ
 	router.GET("/callback", callback.Handler(auth))
-	// ライフログ画面のハンドラ
-	router.GET("/lifelog", lifelog.Handler)
 
+	auth_user_group := router.Group("/auth")
+	auth_user_group.Use(authRequired())
+	{
+		// ライフログ画面のハンドラ
+		router.GET("/lifelog", lifelog.Handler)
+		router.GET("/logout", logout.Handler)
+	}
 	return router
+}
+
+// ここはうまく動きません
+// 未ログイン状態で/lifelogを見ようとした時にエラーが出る（トップページにリダイレクトしたい）
+// 調べても分からないので後回し
+func authRequired() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		session := sessions.Default(c)
+		profile := session.Get("profile")
+		fmt.Println(profile)
+		if profile == nil {
+			c.Redirect(http.StatusMovedPermanently, "/")
+			c.Abort()
+		}
+		c.Next()
+	}
 }
