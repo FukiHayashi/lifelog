@@ -6,6 +6,8 @@ import (
 
 	"github.com/joho/godotenv"
 
+	"lifelog/database"
+	"lifelog/models"
 	"lifelog/platform/authenticator"
 	"lifelog/platform/router"
 )
@@ -19,6 +21,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("認証器の生成に失敗しました: %v", err)
 	}
+
+	// Connect to DB
+	db := database.DataBaseConnect()
+	// Migrate the schema
+	db.AutoMigrate(&models.User{}) //, &models.LifeLog{}, &models.Appointment{})
 
 	rtr := router.New(auth)
 
