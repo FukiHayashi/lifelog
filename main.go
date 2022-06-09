@@ -12,12 +12,12 @@ import (
 
 func main() {
 	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
+		log.Fatalf(".envファイルの読み込みに失敗しました: %v", err)
 	}
 
 	auth, err := authenticator.New()
 	if err != nil {
-		log.Fatalf("Error Authentication: %v", err)
+		log.Fatalf("認証器の生成に失敗しました: %v", err)
 	}
 
 	rtr := router.New(auth)

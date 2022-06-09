@@ -24,7 +24,7 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 	router.Use(sessions.Sessions("auth-session", store))
 
 	// HTMLテンプレートパス設定
-	router.LoadHTMLGlob("web/template/*")
+	router.LoadHTMLGlob("views/template/*")
 
 	// 無名ハンドラ
 	router.GET("/", func(ctx *gin.Context) {
