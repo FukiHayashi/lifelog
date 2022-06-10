@@ -1,0 +1,15 @@
+.meeting{
+    background-color: rgba(255, 188, 0, 0.3);
+}
+.meal{
+    background-color: rgba(255, 18, 0, 0.3);
+}
+.sleep{
+    background-color: rgba(0, 79, 255, 0.3);
+}
+.default{
+    background-color: gray;
+}
+#scheduler{
+    border: 1px solid #e7e7e7;
+}
