@@ -25,7 +25,7 @@ func main() {
 	// Connect to DB
 	db := database.DataBaseConnect()
 	// Migrate the schema
-	db.AutoMigrate(&models.User{}) //, &models.LifeLog{}, &models.Appointment{})
+	db.AutoMigrate(&models.User{}, &models.LifeLog{}, &models.Appointment{})
 
 	rtr := router.New(auth)
 

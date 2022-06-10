@@ -1,10 +1,10 @@
 package lifelog
 
 import (
+	"encoding/json"
 	"errors"
 	"lifelog/database"
 	"lifelog/models"
-	"log"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
@@ -19,10 +19,20 @@ func Handler(ctx *gin.Context) {
 	db := database.DataBaseConnect()
 	map_profile := profile.(map[string]interface{})
 
-	if err := db.Where("aud = ?", map_profile["aud"].(string)).First(&models.User{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
-		db.Create(&models.User{Aud: map_profile["aud"].(string), Name: map_profile["name"].(string)})
-		log.Print("User created")
+	user := models.User{}
+	// 初めてログインする場合、ユーザを作成
+	if err := db.Where("aud = ?", map_profile["aud"].(string)).First(&user).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		user.Aud = map_profile["aud"].(string)
+		user.Name = map_profile["name"].(string)
+		db.Create(&user)
 	}
-	//	db.Create(&user)
-	ctx.HTML(http.StatusOK, "lifelog.html", profile)
+	// 表示するデータを取得
+	lifelogs := []models.LifeLog{}
+	db.Preload("Appointments").Where(&models.LifeLog{UserId: user.ID}, "user_id").Find(&lifelogs)
+	schedulerjs_list, _ := json.Marshal(lifelogs)
+
+	ctx.HTML(http.StatusOK, "lifelog.html", gin.H{
+		"profile":          profile,
+		"schedulerjs_list": string(schedulerjs_list),
+	})
 }
