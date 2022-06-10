@@ -26,7 +26,8 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 	router.Use(sessions.Sessions("auth-session", store))
 
 	// HTMLテンプレートパス設定
-	router.LoadHTMLGlob("views/template/*")
+	router.LoadHTMLGlob("views/*")
+
 	router.Static("./assets", "./assets")
 
 	// 無名ハンドラ
@@ -43,6 +44,8 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 	{
 		// ライフログ画面のハンドラ
 		router.GET("/lifelog", lifelog.Handler)
+		router.GET("/lifelog/new", lifelog.NewHandler)
+		router.POST("/lifelog/create", lifelog.CreateHandler)
 		router.GET("/logout", logout.Handler)
 	}
 	return router

@@ -30,7 +30,7 @@ $(document).ready(function(){
     ];
 
     // Set the granularity of the time selectors (what nearest time they snap to)
-    var snapTo = 5; // 5 minutes
+    var snapTo = 10; // 5 minutes
     var pixelsPerHour = 90; // How wide an hour should be, in pixels
     var headName = 'Date'; // Text displayed on top of the list of names
     var defaultStartTime = '00:00';

@@ -5,7 +5,8 @@
         <script src="assets/javascripts/logout.js"></script>
 
         <script src="//cdnjs.cloudflare.com/ajax/libs/hogan.js/3.0.2/hogan.min.js"></script>
-        <script src="assets/javascripts/schedulerjs/dist/scheduler.js"></script>
+        <script src="/assets/javascripts/schedulerjs/dist/scheduler.js"></script>
+        <script src="/assets/javascripts/lifelog.js"></script>
 
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
         <link rel="stylesheet" href="/assets/javascripts/schedulerjs/dist/scheduler.css">
@@ -20,4 +21,5 @@
         <div id="scheduler"></div>
         <data id="js_schedulerjs_list" value={{ .schedulerjs_list }}></data>
     </div>
+    <a href="{{ .lifelog_new_path }}">新規登録</a>
 </html>

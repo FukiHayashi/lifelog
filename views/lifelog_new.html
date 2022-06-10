@@ -1,0 +1,24 @@
+<html>
+    <head>
+        <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"></script>
+        <script src="/assets/javascripts/lifelog_new.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.css">
+    </head>
+    <form action="/lifelog/create" method="post">
+        <div>タイトル: <input name="title" id="js_appointment_title"></div>
+        <div>開始時刻: <input name="start" value={{ .start }} class="js_timepic"></div>
+        <div>終了時刻: <input name="end" value={{ .end }} class="js_timepic"></div>
+        <div>分類　　: 
+            <select name="class" id="js_class_select" />
+                <option value="sleep">睡眠</option>
+                <option value="action">行動</option>
+                <option value="meal">食事</option>
+                <option value="bath">風呂</option>
+                <option value="other">その他</option>
+            </select>
+        </div>
+        <input type="submit">
+    </form>
+</html>
