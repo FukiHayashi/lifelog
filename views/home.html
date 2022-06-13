@@ -2,8 +2,13 @@
     Home
 {{end}}
 {{define "content"}}
-    <div>
-        <h3>Auth0 OpenID Connectサンプル</h3>
-        <a href="/login">サインイン</a>
+    <link rel="stylesheet" href="/assets/stylesheets/home.css">
+    <div class="container">
+    <div class="dflex align-items-center row">
+        <div class="d-grid gap-2 col-8 mx-auto">
+            <div class="d-flex justify-content-center">このアプリケーションは自身の生活記録を行うために作成しました</div>
+            <a href="/login" class="btn btn-primary" role="button">サインイン</a>
+        </div>
+    </div>
     </div>
 {{end}}
