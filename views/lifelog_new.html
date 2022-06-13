@@ -1,24 +1,38 @@
 {{define "title"}}
-    新規登録
+    記録登録
 {{end}}
 {{define "content"}}
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"></script>
     <script src="/assets/javascripts/lifelog_new.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.css">
-    <form action="/lifelog/create" method="post">
-        <div>タイトル: <input name="title" id="js_appointment_title"></div>
-        <div>開始時刻: <input name="start" value={{ .start }} class="js_timepic"></div>
-        <div>終了時刻: <input name="end" value={{ .end }} class="js_timepic"></div>
-        <div>分類　　: 
-            <select name="class" id="js_class_select" />
-                <option value="sleep">睡眠</option>
-                <option value="action">行動</option>
-                <option value="meal">食事</option>
-                <option value="bath">風呂</option>
-                <option value="other">その他</option>
-            </select>
-        </div>
-        <input type="submit">
-    </form>
+    <div class="mb-3"></div>
+    <div class="container">
+        <form action="/lifelog/create" method="post">
+            <div class="mb-3">
+                <label class="form-label">タイトル</label>
+                <input name="title" class="form-control" id="js_appointment_title">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">開始時刻</label>
+                <input name="start" class="form-control" value={{ .start }} class="js_timepic">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">終了時刻</label>
+                <input name="end"class="form-control"  value={{ .end }} class="js_timepic">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">分類</label>
+                <select name="class" class="form-select" id="js_class_select" />
+                    <option value="sleep">睡眠</option>
+                    <option value="action">行動</option>
+                    <option value="meal">食事</option>
+                    <option value="bath">風呂</option>
+                    <option value="other">その他</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">登録</button>
+            <a href="/lifelog" class="btn btn-danger" role="button">キャンセル</a>
+        </form>
+    </div>
 {{end}}
