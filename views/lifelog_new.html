@@ -1,11 +1,11 @@
-<html>
-    <head>
-        <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"></script>
-        <script src="/assets/javascripts/lifelog_new.js"></script>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.css">
-    </head>
+{{define "title"}}
+    新規登録
+{{end}}
+{{define "content"}}
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"></script>
+    <script src="/assets/javascripts/lifelog_new.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.css">
     <form action="/lifelog/create" method="post">
         <div>タイトル: <input name="title" id="js_appointment_title"></div>
         <div>開始時刻: <input name="start" value={{ .start }} class="js_timepic"></div>
@@ -21,4 +21,4 @@
         </div>
         <input type="submit">
     </form>
-</html>
+{{end}}
