@@ -54,10 +54,14 @@ func Handler(ctx *gin.Context) {
 }
 
 func NewHandler(ctx *gin.Context) {
+	session := sessions.Default(ctx)
+	profile := session.Get("profile")
+
 	now := time.Now()
 	ctx.HTML(http.StatusOK, "lifelog_new.html", gin.H{
-		"start": now.Format("2006/01/02 15:04"),
-		"end":   now.Add(time.Minute * 30).Format("2006/01/02 15:04"),
+		"profile": profile,
+		"start":   now.Format("2006/01/02 15:04"),
+		"end":     now.Add(time.Minute * 30).Format("2006/01/02 15:04"),
 	})
 }
 
