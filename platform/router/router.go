@@ -14,6 +14,7 @@ import (
 	"lifelog/controllers/login"
 	"lifelog/controllers/logout"
 	"lifelog/platform/authenticator"
+	"lifelog/platform/render"
 )
 
 // New はroutesを登録し、ルーターを返す
@@ -26,7 +27,9 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 	router.Use(sessions.Sessions("auth-session", store))
 
 	// HTMLテンプレートパス設定
-	router.LoadHTMLGlob("views/*")
+	//router.LoadHTMLGlob("views/*")
+	router.HTMLRender = render.CreateRenderTemplates()
+	//	router.SetHTMLTemplate(render.RenderTemplate("home.html"))
 
 	router.Static("./assets", "./assets")
 
