@@ -11,7 +11,11 @@
         </title>
     </head>
     <body>
+        {{block "header" .}}
+        {{end}}
         {{block "content" .}}
+        {{end}}
+        {{block "footer" .}}
         {{end}}
     </body>
 </html>

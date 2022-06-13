@@ -27,9 +27,7 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 	router.Use(sessions.Sessions("auth-session", store))
 
 	// HTMLテンプレートパス設定
-	//router.LoadHTMLGlob("views/*")
 	router.HTMLRender = render.CreateRenderTemplates()
-	//	router.SetHTMLTemplate(render.RenderTemplate("home.html"))
 
 	router.Static("./assets", "./assets")
 
