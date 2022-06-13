@@ -50,7 +50,6 @@ func Handler(ctx *gin.Context) {
 	ctx.HTML(http.StatusOK, "lifelog_index.html", gin.H{
 		"profile":          profile,
 		"schedulerjs_list": string(schedulerjs_list),
-		"lifelog_new_path": "/lifelog/new",
 	})
 }
 
