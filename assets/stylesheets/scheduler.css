@@ -10,6 +10,9 @@
 .bath{
     background-color: rgba(128, 128, 128, 0.3);
 }
+.remarks{
+    background-color: azure;
+}
 .other{
     background-color: rgba(255, 0, 0, 0.3);
 }
@@ -18,4 +21,8 @@
 }
 #scheduler{
     border: 1px solid #e7e7e7;
+}
+
+.sjs-grid-overlay-col-time{
+    display:none;
 }

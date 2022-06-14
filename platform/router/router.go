@@ -13,6 +13,7 @@ import (
 	"lifelog/controllers/lifelog"
 	"lifelog/controllers/login"
 	"lifelog/controllers/logout"
+	"lifelog/controllers/remarks"
 	"lifelog/platform/authenticator"
 	"lifelog/platform/render"
 )
@@ -47,6 +48,8 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 		router.GET("/lifelog", lifelog.Handler)
 		router.GET("/lifelog/new", lifelog.NewHandler)
 		router.POST("/lifelog/create", lifelog.CreateHandler)
+		router.GET("/remarks/new", remarks.NewHandler)
+		router.POST("/remarks/create", remarks.CreateHandler)
 		router.GET("/logout", logout.Handler)
 	}
 	return router
