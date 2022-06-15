@@ -45,7 +45,7 @@ $(document).ready(function(){
                 if(e.payload == payload){
                     var url = ""
                     if(e.class == "remarks" && e.payload == payload){
-                        url = "#";
+                        url = '/remarks/edit/' + payload;
                     }else{
                         url = '/lifelog/edit/' + payload;
                     }
