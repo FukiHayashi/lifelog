@@ -38,7 +38,24 @@ $(document).ready(function(){
     var defaultEndTime = '00:00';
     var onClickAppointment = function(payload){
         // Do something with the payload
-        window.location.href = '/lifelog/edit/' + payload;
+        outerIndex:
+        for(var index = 0; index < list.length; index++){
+            for(var i = 0; i < list[index].appointments.length; i++){
+                var e = list[index].appointments[i]
+                if(e.payload == payload){
+                    var url = ""
+                    if(e.class == "remarks" && e.payload == payload){
+                        url = "#";
+                    }else{
+                        url = '/lifelog/edit/' + payload;
+                    }
+                    window.location.href = url;
+                    break outerIndex;
+                }else{
+                    continue;
+                }
+            };
+        };
     };
 
     var $scheduler = $("#scheduler").schedulerjs({
