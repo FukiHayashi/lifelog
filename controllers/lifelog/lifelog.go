@@ -66,6 +66,48 @@ func NewHandler(ctx *gin.Context) {
 }
 
 func CreateHandler(ctx *gin.Context) {
+	createLifelog(ctx)
+	ctx.Redirect(http.StatusMovedPermanently, "/lifelog")
+}
+
+func EditHandler(ctx *gin.Context) {
+	session := sessions.Default(ctx)
+	profile := session.Get("profile")
+
+	db := database.DataBaseConnect()
+
+	appointment := models.Appointment{}
+	lifelog := models.LifeLog{}
+	db.Where("id = ?", ctx.Param("appointmentId")).First(&appointment)
+	db.Where("id = ?", appointment.LifeLogId).First(&lifelog)
+	ctx.HTML(http.StatusOK, "lifelog_edit.html", gin.H{
+		"profile":             profile,
+		"lifelog_update_path": "/lifelog/update/" + ctx.Param("appointmentId"),
+		"title":               appointment.Title,
+		"start":               lifelog.Name + " " + appointment.Start,
+		"end":                 lifelog.Name + " " + appointment.End,
+		"class":               appointment.Class,
+	})
+}
+
+func UpdateHandler(ctx *gin.Context) {
+	createLifelog(ctx)
+	deleteLifelog(ctx)
+	ctx.Redirect(http.StatusMovedPermanently, "/lifelog")
+}
+
+func DeleteHandler(ctx *gin.Context) {
+	deleteLifelog(ctx)
+}
+
+func deleteLifelog(ctx *gin.Context) {
+	db := database.DataBaseConnect()
+	appointment := models.Appointment{}
+	db.Where("id = ?", ctx.Param("appointmentId")).First(&appointment)
+	db.Delete(&appointment)
+}
+
+func createLifelog(ctx *gin.Context) {
 	session := sessions.Default(ctx)
 	profile := session.Get("profile")
 	user := getUserInfo(profile.(map[string]interface{}))
@@ -74,6 +116,7 @@ func CreateHandler(ctx *gin.Context) {
 	// ユーザの取得
 	db.Where("aud = ?", user.Aud).First(&user)
 
+	// フォーム情報を取得
 	appointment := models.Appointment{
 		Title: ctx.PostForm("title"),
 		Start: ctx.PostForm("start"),
@@ -82,7 +125,6 @@ func CreateHandler(ctx *gin.Context) {
 	}
 
 	lifelogs := []models.LifeLog{}
-	// 日を跨いだ場合、appointmentを分割する
 	start_time, _ := time.Parse("2006/01/02 15:04", appointment.Start)
 	end_time, _ := time.Parse("2006/01/02 15:04", appointment.End)
 
@@ -91,10 +133,10 @@ func CreateHandler(ctx *gin.Context) {
 		time.Date(start_time.Year(), start_time.Month(), start_time.Day(), 0, 0, 0, 0, time.Local),
 		time.Date(end_time.Year(), end_time.Month(), end_time.Day(), 23, 59, 59, 999, time.Local)).Find(&lifelogs)
 
+	// 日を跨いだ場合、appointmentを分割する
 	for i := 0; i < len(lifelogs); i++ {
-		//		lifelog := models.LifeLog{Appointments: []models.Appointment{}}
-		//		lifelog.Name = start_time.Format("2006/01/02")
 		if end_time.Day() > start_time.Day() {
+			// 開始時刻から日の終わりまで
 			lifelogs[i].Appointments = append(lifelogs[i].Appointments, models.Appointment{
 				Title: appointment.Title,
 				Start: start_time.Format("15:04"),
@@ -102,22 +144,18 @@ func CreateHandler(ctx *gin.Context) {
 				Class: appointment.Class,
 			})
 			start_time = time.Date(start_time.Year(), start_time.Month(), start_time.Day()+1, 0, 0, 0, 0, time.Local)
-			//			lifelogs = append(lifelogs, lifelog)
 		} else {
+			// 日の始まりから終了時刻まで
 			lifelogs[i].Appointments = append(lifelogs[i].Appointments, models.Appointment{
 				Title: appointment.Title,
 				Start: start_time.Format("15:04"),
 				End:   end_time.Format("15:04"),
 				Class: appointment.Class,
 			})
-			//			lifelogs = append(lifelogs, lifelog)
 			break
 		}
 	}
-	//	user.Lifelogs = lifelogs
-	//	fmt.Println(lifelogs)
 	db.Save(&lifelogs)
-	ctx.Redirect(http.StatusMovedPermanently, "/lifelog")
 }
 
 func getUserInfo(map_profile map[string]interface{}) models.User {

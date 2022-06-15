@@ -1,0 +1,37 @@
+{{define "title"}}
+    記録編集
+{{end}}
+{{define "content"}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"></script>
+    <script src="/assets/javascripts/lifelog_new.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.css">
+    <div class="mb-3"></div>
+    <div class="container">
+        <form action={{ .lifelog_update_path }} method="post">
+            <div class="mb-3">
+                <label class="form-label">タイトル</label>
+                <input name="title" class="form-control" id="js_appointment_title" value={{ .title }}>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">開始時刻</label>
+                <input name="start" class="form-control js_timepic" value={{ .start }}>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">終了時刻</label>
+                <input name="end" class="form-control js_timepic"  value={{ .end }}>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">分類</label>
+                <select name="class" class="form-select" id="js_class_select" />
+                    <option value="sleep" {{ if eq .class "sleep" }} selected {{ end }}>睡眠</option>
+                    <option value="action" {{ if eq .class "action" }} selected {{ end }}>行動</option>
+                    <option value="meal" {{ if eq .class "meal" }} selected {{ end }}>食事</option>
+                    <option value="bath" {{ if eq .class "bath" }} selected {{ end }}>風呂</option>
+                    <option value="other" {{ if eq .class "other" }} selected {{ end }}>その他</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">登録</button>
+            <a href="/lifelog" class="btn btn-danger" role="button">キャンセル</a>
+        </form>
+    </div>
+{{end}}

@@ -38,6 +38,7 @@ $(document).ready(function(){
     var defaultEndTime = '00:00';
     var onClickAppointment = function(payload){
         // Do something with the payload
+        window.location.href = '/lifelog/edit/' + payload;
     };
 
     var $scheduler = $("#scheduler").schedulerjs({
