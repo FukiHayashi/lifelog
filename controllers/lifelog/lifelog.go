@@ -83,6 +83,7 @@ func EditHandler(ctx *gin.Context) {
 	ctx.HTML(http.StatusOK, "lifelog_edit.html", gin.H{
 		"profile":             profile,
 		"lifelog_update_path": "/lifelog/update/" + ctx.Param("appointmentId"),
+		"lifelog_delete_path": "/lifelog/delete/" + ctx.Param("appointmentId"),
 		"title":               appointment.Title,
 		"start":               lifelog.Name + " " + appointment.Start,
 		"end":                 lifelog.Name + " " + appointment.End,

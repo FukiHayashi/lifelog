@@ -50,7 +50,7 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 		router.POST("/lifelog/create", lifelog.CreateHandler)
 		router.GET("/lifelog/edit/:appointmentId", lifelog.EditHandler)
 		router.POST("/lifelog/update/:appointmentId", lifelog.UpdateHandler)
-		router.DELETE("/liffelog/delete/:appointmentId", lifelog.DeleteHandler)
+		router.DELETE("/lifelog/delete/:appointmentId", lifelog.DeleteHandler)
 		router.GET("/remarks/new", remarks.NewHandler)
 		router.POST("/remarks/create", remarks.CreateHandler)
 		router.GET("/logout", logout.Handler)
