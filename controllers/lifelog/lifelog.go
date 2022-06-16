@@ -44,7 +44,7 @@ func Handler(ctx *gin.Context) {
 
 	// 表示するデータを取得
 	lifelogs := []models.LifeLog{}
-	db.Preload("Appointments").Where(&models.LifeLog{UserId: user.ID}).Find(&lifelogs)
+	db.Preload("Appointments").Where(&models.LifeLog{UserId: user.ID}).Order("name").Find(&lifelogs)
 	schedulerjs_list, _ := json.Marshal(lifelogs)
 
 	ctx.HTML(http.StatusOK, "lifelog_index.html", gin.H{
