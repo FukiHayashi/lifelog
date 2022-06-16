@@ -69,3 +69,9 @@ $(document).ready(function(){
         'onClickAppointment': onClickAppointment
     });
 });
+
+$(document).ready(function () {
+    $('#js_monthly_selector').change(function (e) {
+        window.location.href = '/lifelog/' + $('#js_monthly_selector').val();
+    });
+});

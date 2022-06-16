@@ -11,10 +11,10 @@
     <link rel="stylesheet" href="/assets/stylesheets/lifelog.css">
 
     <div>
-        <select name="class" class="form-select form-select-sm"/>
+        <select name="class" class="form-select form-select-sm" id="js_monthly_selector"/>
             {{ $m := .this_month }}
             {{ range .months }}
-                <option value="{{ . }}" {{ if eq . $m }}selected{{ end }}>{{ . }}月</option>
+                <option value="{{ . }}" {{ if eq . $m }}selected{{ end }}>{{ . }}</option>
             {{ end }}
         </select>
     </div>

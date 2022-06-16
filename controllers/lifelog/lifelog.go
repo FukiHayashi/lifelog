@@ -6,6 +6,7 @@ import (
 	"lifelog/database"
 	"lifelog/models"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-contrib/sessions"
@@ -44,21 +45,52 @@ func Handler(ctx *gin.Context) {
 
 	// 表示するデータを取得
 	lifelogs := []models.LifeLog{}
-	db.Preload("Appointments").Where(&models.LifeLog{UserId: user.ID}).Order("name").Find(&lifelogs)
+	db.Preload("Appointments").Where(&models.LifeLog{UserId: user.ID}).Where("name like ?", now.Format("2006/01")+"/%").Order("name").Find(&lifelogs)
 	schedulerjs_list, _ := json.Marshal(lifelogs)
 
 	// DBに存在する月データを取得する
 	var monthes []string
-	db.Model(&models.LifeLog{}).Where("name like ?", "%/01").Pluck("name", &monthes)
+	db.Model(&models.LifeLog{}).Where("name like ?", "%/01").Order("name").Pluck("name", &monthes)
 	for i, m := range monthes {
 		t, _ := time.Parse("2006/01/02", m)
-		monthes[i] = t.Format("1")
+		monthes[i] = t.Format("2006-01")
 	}
 
 	ctx.HTML(http.StatusOK, "lifelog_index.html", gin.H{
 		"profile":          profile,
 		"months":           monthes,
-		"this_month":       now.Format("1"),
+		"this_month":       now.Format("2006-01"),
+		"schedulerjs_list": string(schedulerjs_list),
+	})
+}
+
+func MonthlyHandler(ctx *gin.Context) {
+	session := sessions.Default(ctx)
+	profile := session.Get("profile")
+	// Connect to DB
+	db := database.DataBaseConnect()
+	map_profile := profile.(map[string]interface{})
+	user := models.User{}
+	// ユーザ情報を取得
+	db.Where("aud = ?", map_profile["aud"].(string)).First(&user)
+
+	// 表示するデータを取得
+	lifelogs := []models.LifeLog{}
+	db.Preload("Appointments").Where(&models.LifeLog{UserId: user.ID}).Where("name like ?", strings.Replace(ctx.Param("month"), "-", "/", -1)+"/%").Order("name").Find(&lifelogs)
+	schedulerjs_list, _ := json.Marshal(lifelogs)
+
+	// DBに存在する月データを取得する
+	var monthes []string
+	db.Model(&models.LifeLog{}).Where("name like ?", "%/01").Order("name").Pluck("name", &monthes)
+	for i, m := range monthes {
+		t, _ := time.Parse("2006/01/02", m)
+		monthes[i] = t.Format("2006-01")
+	}
+
+	ctx.HTML(http.StatusOK, "lifelog_index.html", gin.H{
+		"profile":          profile,
+		"months":           monthes,
+		"this_month":       ctx.Param("month"),
 		"schedulerjs_list": string(schedulerjs_list),
 	})
 }
@@ -138,6 +170,23 @@ func createLifelog(ctx *gin.Context) {
 	lifelogs := []models.LifeLog{}
 	start_time, _ := time.Parse("2006/01/02 15:04", appointment.Start)
 	end_time, _ := time.Parse("2006/01/02 15:04", appointment.End)
+
+	// 月のデータが無い場合、その月のカレンダーを作成
+	for _, t := range []time.Time{start_time, end_time} {
+		if err := db.Where("name = ?", t.Format("2006/01/02")).First(&models.LifeLog{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+			lifelogs := []models.LifeLog{}
+			name_date := time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.Local)
+			for name_date.Month() == t.Month() {
+				lifelogs = append(lifelogs, models.LifeLog{
+					UserId:   user.ID,
+					LoggedAt: name_date,
+					Name:     name_date.Format("2006/01/02"),
+				})
+				name_date = name_date.AddDate(0, 0, 1)
+			}
+			db.Create(&lifelogs)
+		}
+	}
 
 	// Lifelogの範囲の日付を取得
 	db.Where(&models.LifeLog{UserId: user.ID}).Where("logged_at BETWEEN ? AND ?",
