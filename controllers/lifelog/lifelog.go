@@ -47,8 +47,18 @@ func Handler(ctx *gin.Context) {
 	db.Preload("Appointments").Where(&models.LifeLog{UserId: user.ID}).Order("name").Find(&lifelogs)
 	schedulerjs_list, _ := json.Marshal(lifelogs)
 
+	// DBに存在する月データを取得する
+	var monthes []string
+	db.Model(&models.LifeLog{}).Where("name like ?", "%/01").Pluck("name", &monthes)
+	for i, m := range monthes {
+		t, _ := time.Parse("2006/01/02", m)
+		monthes[i] = t.Format("1")
+	}
+
 	ctx.HTML(http.StatusOK, "lifelog_index.html", gin.H{
 		"profile":          profile,
+		"months":           monthes,
+		"this_month":       now.Format("1"),
 		"schedulerjs_list": string(schedulerjs_list),
 	})
 }

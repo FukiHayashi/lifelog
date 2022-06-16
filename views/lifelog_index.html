@@ -10,6 +10,14 @@
     <link rel="stylesheet" href="/assets/stylesheets/scheduler.css">
     <link rel="stylesheet" href="/assets/stylesheets/lifelog.css">
 
+    <div>
+        <select name="class" class="form-select form-select-sm"/>
+            {{ $m := .this_month }}
+            {{ range .months }}
+                <option value="{{ . }}" {{ if eq . $m }}selected{{ end }}>{{ . }}月</option>
+            {{ end }}
+        </select>
+    </div>
     <div id="scheduler"></div>
     <data id="js_schedulerjs_list" value={{ .schedulerjs_list }}></data>
 {{end}}
