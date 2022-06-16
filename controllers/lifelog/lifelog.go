@@ -191,11 +191,11 @@ func createLifelog(ctx *gin.Context) {
 	// Lifelogの範囲の日付を取得
 	db.Where(&models.LifeLog{UserId: user.ID}).Where("logged_at BETWEEN ? AND ?",
 		time.Date(start_time.Year(), start_time.Month(), start_time.Day(), 0, 0, 0, 0, time.Local),
-		time.Date(end_time.Year(), end_time.Month(), end_time.Day(), 23, 59, 59, 999, time.Local)).Find(&lifelogs)
+		time.Date(end_time.Year(), end_time.Month(), end_time.Day(), 23, 59, 59, 999, time.Local)).Order("name").Find(&lifelogs)
 
 	// 日を跨いだ場合、appointmentを分割する
 	for i := 0; i < len(lifelogs); i++ {
-		if end_time.Day() > start_time.Day() {
+		if end_time.Day() != start_time.Day() {
 			// 開始時刻から日の終わりまで
 			lifelogs[i].Appointments = append(lifelogs[i].Appointments, models.Appointment{
 				Title: appointment.Title,
