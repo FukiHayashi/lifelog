@@ -1,5 +1,6 @@
 # Use in Project
 .env
+.testenv
 go.sum
 
 # OSX
