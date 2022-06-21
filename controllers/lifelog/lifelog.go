@@ -33,10 +33,11 @@ func Handler(ctx *gin.Context) {
 		lifelogs := []models.LifeLog{}
 		name_date := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, time.Local)
 		for name_date.Month() == now.Month() {
+			lifelog_name := name_date.Format("2006/01/02")
 			lifelogs = append(lifelogs, models.LifeLog{
 				UserId:   user.ID,
 				LoggedAt: name_date,
-				Name:     name_date.Format("2006/01/02"),
+				Name:     &lifelog_name,
 			})
 			name_date = name_date.AddDate(0, 0, 1)
 		}
@@ -127,8 +128,8 @@ func EditHandler(ctx *gin.Context) {
 		"lifelog_update_path": "/lifelog/update/" + ctx.Param("appointmentId"),
 		"lifelog_delete_path": "/lifelog/delete/" + ctx.Param("appointmentId"),
 		"title":               appointment.Title,
-		"start":               lifelog.Name + " " + appointment.Start,
-		"end":                 lifelog.Name + " " + appointment.End,
+		"start":               *lifelog.Name + " " + appointment.Start,
+		"end":                 *lifelog.Name + " " + appointment.End,
 		"class":               appointment.Class,
 	})
 }
@@ -177,10 +178,11 @@ func createLifelog(ctx *gin.Context) {
 			lifelogs := []models.LifeLog{}
 			name_date := time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.Local)
 			for name_date.Month() == t.Month() {
+				lifelog_name := name_date.Format("2006/01/02")
 				lifelogs = append(lifelogs, models.LifeLog{
 					UserId:   user.ID,
 					LoggedAt: name_date,
-					Name:     name_date.Format("2006/01/02"),
+					Name:     &lifelog_name,
 				})
 				name_date = name_date.AddDate(0, 0, 1)
 			}

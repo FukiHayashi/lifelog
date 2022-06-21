@@ -57,9 +57,10 @@ func (suite *DataBaseTestSuite) TestCreate() {
 			Name: "lifelogtestname",
 		}
 		suite.db.Create(&user)
+		name := "testname"
 		lifelog := models.LifeLog{
 			UserId: user.ID,
-			Name:   "testname",
+			Name:   &name,
 		}
 		err := suite.db.Create(&lifelog).Error
 		if err != nil {
@@ -73,9 +74,10 @@ func (suite *DataBaseTestSuite) TestCreate() {
 			Name: "apptestname",
 		}
 		suite.db.Create(&user)
+		name := "apptestname"
 		lifelog := models.LifeLog{
 			UserId: user.ID,
-			Name:   "apptestname",
+			Name:   &name,
 		}
 		suite.db.Create(&lifelog)
 		appointment := models.Appointment{
