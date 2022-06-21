@@ -18,7 +18,6 @@ type DataBaseTestSuite struct {
 func (suite *DataBaseTestSuite) SetupTest() {
 	// テスト環境のDBに接続
 	db := DataBaseConnect(SetPathOption("../.testenv"))
-	//	dbRepository := DataBaseReopsitory{DB: db}
 	suite.db = db
 	// DBのマイグレーション
 	suite.db.AutoMigrate(&models.User{}, &models.LifeLog{}, &models.Appointment{})
@@ -41,8 +40,9 @@ func TestUserTestSuite(t *testing.T) {
 // Createのテスト
 func (suite *DataBaseTestSuite) TestCreate() {
 	suite.Run("User Create", func() {
+		aud := "testaud"
 		user := models.User{
-			Aud:  "testaud",
+			Aud:  &aud,
 			Name: "testname",
 		}
 		err := suite.db.Create(&user).Error
@@ -51,8 +51,9 @@ func (suite *DataBaseTestSuite) TestCreate() {
 		}
 	})
 	suite.Run("Lifelog Create", func() {
+		aud := "lifelogtestaud"
 		user := models.User{
-			Aud:  "lifelogtestaud",
+			Aud:  &aud,
 			Name: "lifelogtestname",
 		}
 		suite.db.Create(&user)
@@ -66,8 +67,9 @@ func (suite *DataBaseTestSuite) TestCreate() {
 		}
 	})
 	suite.Run("Appointment Create", func() {
+		aud := "apptestaud"
 		user := models.User{
-			Aud:  "apptestaud",
+			Aud:  &aud,
 			Name: "apptestname",
 		}
 		suite.db.Create(&user)

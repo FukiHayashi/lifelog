@@ -119,7 +119,7 @@ func deleteRemarks(ctx *gin.Context) {
 // profileからユーザ情報を取得する
 func getUserInfo(map_profile map[string]interface{}) models.User {
 	user := models.User{}
-	user.Aud = map_profile["aud"].(string)
+	user.Aud = map_profile["aud"].(*string)
 	user.Name = map_profile["name"].(string)
 	return user
 }
