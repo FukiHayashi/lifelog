@@ -24,7 +24,7 @@ var _ = Describe("Home", func() {
 			Expect(page.Navigate("http://localhost:3000")).To(Succeed())
 		})
 		It("Home画面が表示されること", func() {
-			Expect(page).To(HaveTitle("Home"))
+			Expect(page).To(HaveTitle("Lifelog Home"))
 		})
 		It("サインインのリンクがあること", func() {
 			Expect(page.FindByID("signin").Text()).To(Equal("サインイン"))
