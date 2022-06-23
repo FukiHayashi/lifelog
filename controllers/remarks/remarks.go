@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"lifelog/database"
+	. "lifelog/helpers"
 	"lifelog/models"
 	"net/http"
 	"time"
@@ -37,9 +38,9 @@ func CreateHandler(ctx *gin.Context) {
 
 	// 入力値を取得
 	appointment := models.Appointment{
-		Title: ctx.PostForm("title"),
-		Start: "24:00",
-		End:   "25:00",
+		Title: GetStringPointer(ctx.PostForm("title")),
+		Start: GetStringPointer("24:00"),
+		End:   GetStringPointer("25:00"),
 		Class: "remarks",
 	}
 
@@ -56,7 +57,7 @@ func CreateHandler(ctx *gin.Context) {
 		db.Save(&lifelog)
 	} else {
 		// 追記の場合
-		remarks.Title = remarks.Title + "," + appointment.Title
+		remarks.Title = GetStringPointer(*remarks.Title + "," + *appointment.Title)
 		fmt.Println(remarks)
 		db.Save(&remarks)
 	}
@@ -99,7 +100,7 @@ func UpdateHandler(ctx *gin.Context) {
 	db.Where(&models.Appointment{LifeLogId: lifelog.ID}).Where("id = ?", ctx.Param("remarksId")).First(&remarks)
 
 	// 値を更新
-	remarks.Title = ctx.PostForm("title")
+	remarks.Title = GetStringPointer(ctx.PostForm("title"))
 	db.Save(&remarks)
 
 	ctx.Redirect(http.StatusMovedPermanently, "/lifelog")

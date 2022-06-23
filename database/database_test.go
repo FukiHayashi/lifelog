@@ -80,8 +80,10 @@ func (suite *DataBaseTestSuite) TestCreate() {
 			Name:   &name,
 		}
 		suite.db.Create(&lifelog)
+		title := "testtitle"
 		appointment := models.Appointment{
 			LifeLogId: lifelog.ID,
+			Title:     &title,
 		}
 		err := suite.db.Create(&appointment).Error
 		if err != nil {

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"lifelog/database"
+	. "lifelog/helpers"
 	"lifelog/models"
 	"net/http"
 	"strings"
@@ -128,8 +129,8 @@ func EditHandler(ctx *gin.Context) {
 		"lifelog_update_path": "/lifelog/update/" + ctx.Param("appointmentId"),
 		"lifelog_delete_path": "/lifelog/delete/" + ctx.Param("appointmentId"),
 		"title":               appointment.Title,
-		"start":               *lifelog.Name + " " + appointment.Start,
-		"end":                 *lifelog.Name + " " + appointment.End,
+		"start":               *lifelog.Name + " " + *appointment.Start,
+		"end":                 *lifelog.Name + " " + *appointment.End,
 		"class":               appointment.Class,
 	})
 }
@@ -162,15 +163,15 @@ func createLifelog(ctx *gin.Context) {
 
 	// フォーム情報を取得
 	appointment := models.Appointment{
-		Title: ctx.PostForm("title"),
-		Start: ctx.PostForm("start"),
-		End:   ctx.PostForm("end"),
+		Title: GetStringPointer(ctx.PostForm("title")),
+		Start: GetStringPointer(ctx.PostForm("start")),
+		End:   GetStringPointer(ctx.PostForm("end")),
 		Class: ctx.PostForm("class"),
 	}
 
 	lifelogs := []models.LifeLog{}
-	start_time, _ := time.Parse("2006/01/02 15:04", appointment.Start)
-	end_time, _ := time.Parse("2006/01/02 15:04", appointment.End)
+	start_time, _ := time.Parse("2006/01/02 15:04", *appointment.Start)
+	end_time, _ := time.Parse("2006/01/02 15:04", *appointment.End)
 
 	// 月のデータが無い場合、その月のカレンダーを作成
 	for _, t := range []time.Time{start_time, end_time} {
@@ -199,10 +200,12 @@ func createLifelog(ctx *gin.Context) {
 	for i := 0; i < len(lifelogs); i++ {
 		if end_time.Day() != start_time.Day() {
 			// 開始時刻から日の終わりまで
+			start := start_time.Format("15:04")
+			end := "23:59"
 			lifelogs[i].Appointments = append(lifelogs[i].Appointments, models.Appointment{
 				Title: appointment.Title,
-				Start: start_time.Format("15:04"),
-				End:   "23:59",
+				Start: &start,
+				End:   &end,
 				Class: appointment.Class,
 			})
 			start_time = time.Date(start_time.Year(), start_time.Month(), start_time.Day()+1, 0, 0, 0, 0, time.Local)
@@ -210,8 +213,8 @@ func createLifelog(ctx *gin.Context) {
 			// 日の始まりから終了時刻まで
 			lifelogs[i].Appointments = append(lifelogs[i].Appointments, models.Appointment{
 				Title: appointment.Title,
-				Start: start_time.Format("15:04"),
-				End:   end_time.Format("15:04"),
+				Start: GetStringPointer(start_time.Format("15:04")),
+				End:   GetStringPointer(end_time.Format("15:04")),
 				Class: appointment.Class,
 			})
 			break
@@ -221,8 +224,10 @@ func createLifelog(ctx *gin.Context) {
 }
 
 func getUserInfo(map_profile map[string]interface{}) models.User {
-	user := models.User{}
-	user.Aud = map_profile["aud"].(*string)
-	user.Name = map_profile["name"].(string)
+	aud := map_profile["aud"].(string)
+	user := models.User{
+		Aud:  &aud,
+		Name: map_profile["name"].(string),
+	}
 	return user
 }

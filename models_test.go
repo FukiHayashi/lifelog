@@ -1,6 +1,7 @@
 package main_test
 
 import (
+	. "lifelog/helpers"
 	"lifelog/models"
 	"lifelog/test"
 	"time"
@@ -112,6 +113,7 @@ var _ = Describe("Models", func() {
 			It("Appointmentが作成される", func() {
 				appointment := models.Appointment{
 					LifeLogId: lifelog.ID,
+					Title:     GetStringPointer(time.Now().String()),
 				}
 				err := th.DB.Create(&appointment).Error
 				Expect(err).Should(BeNil())
@@ -119,9 +121,44 @@ var _ = Describe("Models", func() {
 		})
 		Context("LifelogIdがない時", func() {
 			It("Appointmentが作成されない", func() {
-				appointment := models.Appointment{}
+				appointment := models.Appointment{
+					Title: GetStringPointer(time.Now().String()),
+				}
 				err := th.DB.Create(&appointment).Error
 				Expect(err).ShouldNot(BeNil())
+			})
+		})
+		Context("Titleがない時", func() {
+			It("Appointmentが作成されない", func() {
+				appointment := models.Appointment{
+					LifeLogId: lifelog.ID,
+				}
+				err := th.DB.Create(&appointment).Error
+				Expect(err).ShouldNot(BeNil())
+			})
+		})
+		Context("Startがない時", func() {
+			It("Startが00:00でAppointmentが作成される", func() {
+				appointment := models.Appointment{
+					LifeLogId: lifelog.ID,
+					Title:     GetStringPointer(time.Now().String()),
+					End:       GetStringPointer("02:00"),
+				}
+				err := th.DB.Create(&appointment).Error
+				Expect(err).ShouldNot(BeNil())
+				Expect(*appointment.Start).To(Equal("00:00"))
+			})
+		})
+		Context("Endがない時", func() {
+			It("Endが01:00でAppointmentが作成される", func() {
+				appointment := models.Appointment{
+					LifeLogId: lifelog.ID,
+					Title:     GetStringPointer(time.Now().String()),
+					Start:     GetStringPointer("00:30"),
+				}
+				err := th.DB.Create(&appointment).Error
+				Expect(err).ShouldNot(BeNil())
+				Expect(*appointment.End).To(Equal("01:00"))
 			})
 		})
 	})
