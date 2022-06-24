@@ -14,7 +14,11 @@ $(function(){
     $('#js_timepic_start').change(function(){
         date = new Date($('#js_timepic_start').val());
         date.setMinutes(date.getMinutes()+30);
-        $('#js_timepic_end').val(date.getFullYear() + '/' + (date.getMonth()+1).toString().padStart(2, '0') + '/' + (date.getDate()).toString().padStart(2, '0') + ' ' + date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0'));
+        if($('#js_timepic_start').val() == ""){
+            $('#js_timepic_end').val("")
+        }else{
+            $('#js_timepic_end').val(date.getFullYear() + '/' + (date.getMonth()+1).toString().padStart(2, '0') + '/' + (date.getDate()).toString().padStart(2, '0') + ' ' + date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0'));
+        }
         $('#js_timepic_end').datetimepicker({
             step:10,
             dateformat: 'yyyy-mm-dd',
