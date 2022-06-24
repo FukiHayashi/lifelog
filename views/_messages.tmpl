@@ -1,0 +1,16 @@
+{{define "messages"}}
+    {{if .msg}}
+        <div class="container">
+            <div class=
+                {{if eq .status "success"}}
+                    "bg-success text-white" id="msg-success"
+                {{else if eq .status "error"}}
+                    "bg-danger text-white" id="msg-error"
+                {{else}}
+                    "bg-primary text-white" id="msg-primary"
+                {{end}}
+            >{{.msg}}
+            </div>
+        </div>
+    {{end}}
+{{end}}
