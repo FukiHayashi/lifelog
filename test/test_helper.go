@@ -14,7 +14,7 @@ type TestHelper struct {
 // テスト開始時の処理
 func (th *TestHelper) SetupTest() {
 	// テスト環境のDBに接続
-	db := database.DataBaseConnect(database.SetPathOption(".testenv"))
+	db := database.DataBaseConnect()
 	th.DB = db
 	// DBのマイグレーション
 	th.DB.AutoMigrate(&models.User{}, &models.LifeLog{}, &models.Appointment{})

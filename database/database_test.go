@@ -2,8 +2,10 @@ package database
 
 import (
 	"lifelog/models"
+	"log"
 	"testing"
 
+	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/suite"
 	"gorm.io/gorm"
 )
@@ -16,8 +18,11 @@ type DataBaseTestSuite struct {
 
 // テスト開始時の処理
 func (suite *DataBaseTestSuite) SetupTest() {
+	if err := godotenv.Load("../.testenv"); err != nil {
+		log.Fatalf(".envファイルの読み込みに失敗しました: %v", err)
+	}
 	// テスト環境のDBに接続
-	db := DataBaseConnect(SetPathOption("../.testenv"))
+	db := DataBaseConnect()
 	suite.db = db
 	// DBのマイグレーション
 	suite.db.AutoMigrate(&models.User{}, &models.LifeLog{}, &models.Appointment{})

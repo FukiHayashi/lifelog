@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
 
@@ -13,7 +14,9 @@ import (
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
+	f := flag.String("env", ".env", "Set .env file path")
+	flag.Parse()
+	if err := godotenv.Load(*f); err != nil {
 		log.Fatalf(".envファイルの読み込みに失敗しました: %v", err)
 	}
 
