@@ -30,6 +30,21 @@ func NewHandler(ctx *gin.Context) {
 func CreateHandler(ctx *gin.Context) {
 	session := sessions.Default(ctx)
 	profile := session.Get("profile")
+	if createRemarks(ctx) != nil {
+		ctx.HTML(http.StatusBadRequest, "remarks_new.html", gin.H{
+			"msg":     "未入力の項目があります",
+			"status":  "error",
+			"profile": profile,
+			"date":    time.Now().Format("2006/01/02"),
+		})
+	} else {
+		ctx.Redirect(http.StatusMovedPermanently, "/lifelog")
+	}
+}
+
+func createRemarks(ctx *gin.Context) error {
+	session := sessions.Default(ctx)
+	profile := session.Get("profile")
 	user := getUserInfo(profile.(map[string]interface{}))
 	// Connect to DB
 	db := database.DataBaseConnect()
@@ -44,6 +59,11 @@ func CreateHandler(ctx *gin.Context) {
 		Class: "remarks",
 	}
 
+	// titleがnilになった場合のエラー処理
+	if appointment.Title == nil {
+		return errors.New("FORM INPUT ERROR")
+	}
+
 	lifelog := models.LifeLog{}
 
 	// 入力された日付のLifelogを取得
@@ -51,19 +71,20 @@ func CreateHandler(ctx *gin.Context) {
 
 	// 新規と追記の処理分け
 	remarks := models.Appointment{}
+	var error error
 	if err := db.Where("life_log_id = ?", lifelog.ID).Where("class = ?", "remarks").First(&remarks).Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		// 備考が新規の場合
 		lifelog.Appointments = append(lifelog.Appointments, appointment)
-		db.Save(&lifelog)
+		error = db.Save(&lifelog).Error
 	} else {
 		// 追記の場合
 		remarks.Title = GetStringPointer(*remarks.Title + "," + *appointment.Title)
 		fmt.Println(remarks)
-		db.Save(&remarks)
+		error = db.Save(&remarks).Error
 	}
-
-	ctx.Redirect(http.StatusMovedPermanently, "/lifelog")
+	return error
 }
+
 func EditHandler(ctx *gin.Context) {
 	session := sessions.Default(ctx)
 	profile := session.Get("profile")
@@ -120,7 +141,7 @@ func deleteRemarks(ctx *gin.Context) {
 // profileからユーザ情報を取得する
 func getUserInfo(map_profile map[string]interface{}) models.User {
 	user := models.User{}
-	user.Aud = map_profile["aud"].(*string)
+	user.Aud = GetStringPointer(map_profile["aud"].(string))
 	user.Name = map_profile["name"].(string)
 	return user
 }
