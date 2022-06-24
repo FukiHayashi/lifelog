@@ -4,6 +4,7 @@
 go.sum
 /rgb_go_selenium/bin
 /rgb_go_selenium/log
+.vscode
 
 # OSX
 .DS_Store

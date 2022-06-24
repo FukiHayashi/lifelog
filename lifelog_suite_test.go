@@ -3,6 +3,7 @@ package main_test
 import (
 	"testing"
 
+	"github.com/joho/godotenv"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/sclevine/agouti"
@@ -17,7 +18,8 @@ var agoutiDriver *agouti.WebDriver
 
 var _ = BeforeSuite(func() {
 	// Choose a WebDriver:
-
+	// 設定ファイル読み込み
+	godotenv.Load(".testenv")
 	//agoutiDriver = agouti.PhantomJS()
 	//agoutiDriver = agouti.Selenium()
 	agoutiDriver = agouti.ChromeDriver()

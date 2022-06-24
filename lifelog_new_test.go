@@ -1,11 +1,11 @@
 package main_test
 
 import (
-	"log"
+	"lifelog/database"
+	"lifelog/models"
 	"os"
 	"time"
 
-	"github.com/joho/godotenv"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/sclevine/agouti"
@@ -15,9 +15,17 @@ import (
 var _ = Describe("LifelogNew", Ordered, func() {
 	var page *agouti.Page
 	BeforeAll(func() {
-		if err := godotenv.Load(".testenv"); err != nil {
-			log.Fatalf(".envファイルの読み込みに失敗しました: %v", err)
-		}
+		// テスト環境のDBに接続
+		db := database.DataBaseConnect()
+		// DBのマイグレーション
+		db.AutoMigrate(&models.User{}, &models.LifeLog{}, &models.Appointment{})
+	})
+	AfterAll(func() {
+		// テストに使用したDBの内容を全て削除する
+		db := database.DataBaseConnect()
+		db.Migrator().DropTable(&models.User{}, &models.LifeLog{}, &models.Appointment{})
+		dbc, _ := db.DB()
+		dbc.Close()
 	})
 
 	BeforeEach(func() {
