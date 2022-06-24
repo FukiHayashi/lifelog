@@ -110,8 +110,21 @@ func NewHandler(ctx *gin.Context) {
 }
 
 func CreateHandler(ctx *gin.Context) {
-	createLifelog(ctx)
-	ctx.Redirect(http.StatusMovedPermanently, "/lifelog")
+	session := sessions.Default(ctx)
+	profile := session.Get("profile")
+	now := time.Now()
+
+	if createLifelog(ctx) != nil {
+		ctx.HTML(http.StatusBadRequest, "lifelog_new.html", gin.H{
+			"msg":     "未入力の項目があります",
+			"status":  "error",
+			"profile": profile,
+			"start":   now.Format("2006/01/02 15:04"),
+			"end":     now.Add(time.Minute * 30).Format("2006/01/02 15:04"),
+		})
+	} else {
+		ctx.Redirect(http.StatusMovedPermanently, "/lifelog")
+	}
 }
 
 func EditHandler(ctx *gin.Context) {
@@ -152,7 +165,7 @@ func deleteLifelog(ctx *gin.Context) {
 	db.Delete(&appointment)
 }
 
-func createLifelog(ctx *gin.Context) {
+func createLifelog(ctx *gin.Context) error {
 	session := sessions.Default(ctx)
 	profile := session.Get("profile")
 	user := getUserInfo(profile.(map[string]interface{}))
@@ -167,6 +180,11 @@ func createLifelog(ctx *gin.Context) {
 		Start: GetStringPointer(ctx.PostForm("start")),
 		End:   GetStringPointer(ctx.PostForm("end")),
 		Class: ctx.PostForm("class"),
+	}
+
+	// 未入力エラー対策
+	if appointment.Start == nil || appointment.End == nil {
+		return errors.New("FORM NO INPUT ERROR")
 	}
 
 	lifelogs := []models.LifeLog{}
@@ -220,7 +238,7 @@ func createLifelog(ctx *gin.Context) {
 			break
 		}
 	}
-	db.Save(&lifelogs)
+	return db.Save(&lifelogs).Error
 }
 
 func getUserInfo(map_profile map[string]interface{}) models.User {
