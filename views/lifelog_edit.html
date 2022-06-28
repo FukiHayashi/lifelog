@@ -1,5 +1,5 @@
 {{define "title"}}
-    記録編集
+    行動記録編集
 {{end}}
 {{define "content"}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"></script>
@@ -31,8 +31,8 @@
                     <option value="other" {{ if eq .class "other" }} selected {{ end }}>その他</option>
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary">登録</button>
-            <a href="/lifelog" class="btn btn-secondary" role="button">キャンセル</a>
+            <button type="submit" class="btn btn-primary" id="resister-button">登録</button>
+            <a href="/lifelog" class="btn btn-secondary" role="button" id="cancel-button">キャンセル</a>
         </form>
         <button class="btn btn-danger" href="#" id="js_delete" value={{ .lifelog_delete_path }}>削除</button>
     </div>

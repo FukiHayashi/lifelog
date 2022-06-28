@@ -149,9 +149,31 @@ func EditHandler(ctx *gin.Context) {
 }
 
 func UpdateHandler(ctx *gin.Context) {
-	createLifelog(ctx)
-	deleteLifelog(ctx)
-	ctx.Redirect(http.StatusMovedPermanently, "/lifelog")
+	session := sessions.Default(ctx)
+	profile := session.Get("profile")
+	db := database.DataBaseConnect()
+
+	appointment := models.Appointment{}
+	lifelog := models.LifeLog{}
+	db.Where("id = ?", ctx.Param("appointmentId")).First(&appointment)
+	db.Where("id = ?", appointment.LifeLogId).First(&lifelog)
+
+	if createLifelog(ctx) != nil {
+		ctx.HTML(http.StatusBadRequest, "lifelog_edit.html", gin.H{
+			"msg":                 "未入力の項目があります",
+			"status":              "error",
+			"profile":             profile,
+			"lifelog_update_path": "/lifelog/update/" + ctx.Param("appointmentId"),
+			"lifelog_delete_path": "/lifelog/delete/" + ctx.Param("appointmentId"),
+			"title":               appointment.Title,
+			"start":               *lifelog.Name + " " + *appointment.Start,
+			"end":                 *lifelog.Name + " " + *appointment.End,
+			"class":               appointment.Class,
+		})
+	} else {
+		deleteLifelog(ctx)
+		ctx.Redirect(http.StatusMovedPermanently, "/lifelog")
+	}
 }
 
 func DeleteHandler(ctx *gin.Context) {
