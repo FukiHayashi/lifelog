@@ -17,8 +17,8 @@
                 <label class="form-label">日付</label>
                 <input name="date" class="form-control js_datepic" value={{ .date }}>
             </div>
-            <button type="submit" class="btn btn-primary">登録</button>
-            <a href="/lifelog" class="btn btn-secondary" role="button">キャンセル</a>
+            <button type="submit" class="btn btn-primary" id="resister-button">登録</button>
+            <a href="/lifelog" class="btn btn-secondary" role="button" id="cancel-button">キャンセル</a>
         </form>
         <button class="btn btn-danger" href="#" id="js_delete" value={{ .remarks_delete_path }}>削除</button>
     </div>
