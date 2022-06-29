@@ -115,13 +115,27 @@ func UpdateHandler(ctx *gin.Context) {
 	db.Where(&models.LifeLog{UserId: user.ID}).Where("name = ?", ctx.PostForm("date")).First(&lifelog)
 	// 該当のremarksを取得
 	remarks := models.Remarks{}
-	db.Where(&models.Remarks{LifeLogId: lifelog.ID}).Where("id = ?", ctx.Param("remarksId")).First(&remarks)
+	db.Where("id = ?", ctx.Param("remarksId")).First(&remarks)
 
 	// 値を更新
-	remarks.Title = GetStringPointer(ctx.PostForm("title"))
-	db.Save(&remarks)
 
-	ctx.Redirect(http.StatusMovedPermanently, "/lifelog")
+	if ctx.PostForm("title") == "" || ctx.PostForm("date") == "" {
+		ctx.HTML(http.StatusBadRequest, "remarks_edit.html", gin.H{
+			"msg":                 "未入力の項目があります",
+			"status":              "error",
+			"profile":             profile,
+			"remarks_update_path": "/remarks/update/" + ctx.Param("remarksId"),
+			"remarks_delete_path": "/remarks/delete/" + ctx.Param("remarksId"),
+			"title":               *remarks.Title,
+			"date":                *remarks.Date,
+		})
+	} else {
+		remarks.Title = GetStringPointer(ctx.PostForm("title"))
+		remarks.LifeLogId = lifelog.ID
+		remarks.Date = GetStringPointer(ctx.PostForm("date"))
+		db.Save(&remarks)
+		ctx.Redirect(http.StatusMovedPermanently, "/lifelog")
+	}
 }
 
 func DeleteHandler(ctx *gin.Context) {
