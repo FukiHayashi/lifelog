@@ -1,7 +1,6 @@
 package logout
 
 import (
-	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -34,5 +33,4 @@ func Handler(ctx *gin.Context) {
 	logoutUrl.RawQuery = parameters.Encode()
 
 	ctx.Redirect(http.StatusTemporaryRedirect, logoutUrl.String())
-	log.Fatalf("logout")
 }
