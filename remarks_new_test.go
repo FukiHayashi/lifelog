@@ -18,12 +18,12 @@ var _ = Describe("RemarksNew", Ordered, func() {
 		// テスト環境のDBに接続
 		db := database.DataBaseConnect()
 		// DBのマイグレーション
-		db.AutoMigrate(&models.User{}, &models.LifeLog{}, &models.Appointment{})
+		db.AutoMigrate(&models.User{}, &models.LifeLog{}, &models.Appointment{}, &models.Remarks{})
 	})
 	AfterAll(func() {
 		// テストに使用したDBの内容を全て削除する
 		db := database.DataBaseConnect()
-		db.Migrator().DropTable(&models.User{}, &models.LifeLog{}, &models.Appointment{})
+		db.Migrator().DropTable(&models.User{}, &models.LifeLog{}, &models.Appointment{}, &models.Remarks{})
 		dbc, _ := db.DB()
 		dbc.Close()
 	})
