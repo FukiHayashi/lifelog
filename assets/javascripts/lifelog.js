@@ -26,8 +26,7 @@ $(document).ready(function(){
         '21:00',
         '22:00',
         '23:00',
-        '24:00',
-        '25:00'
+        '24:00'
     ];
 
     // Set the granularity of the time selectors (what nearest time they snap to)
@@ -74,4 +73,44 @@ $(document).ready(function () {
     $('#js_monthly_selector').change(function (e) {
         window.location.href = '/lifelog/' + $('#js_monthly_selector').val();
     });
+});
+
+function addRemarksHead(width){
+    var remarks_head = document.createElement('div');
+    remarks_head.textContent = "備考";
+    remarks_head.style.width = width + "px";
+    remarks_head.className = "sjs-grid-col-head";
+    $('.sjs-grid-row-head').append(remarks_head);
+}
+function addRemarksCol(width){
+    var remarks_col = document.createElement('div');
+    remarks_col.style.width = width + "px";
+    remarks_col.className = "sjs-grid-col";
+    $('.sjs-grid-row').append(remarks_col);
+}
+$(document).ready(function(){
+    var data = JSON.parse($("#js_schedulerjs_list").val());
+//    var data = [{"name":"2022/06/01","remarks":{"title":"test","payload":"1"}}]
+    var sjs_name= $('.sjs-name')
+    var sjs_overlay = $('.sjs-grid-overlay-row');
+
+    const width = 90;
+    addRemarksHead(width);
+    addRemarksCol(width);
+   
+    data.forEach(function(d){
+        for( i=0; i<sjs_name.length; i++){
+            if(d.remarks.date == sjs_name[i].textContent){
+                var new_element = document.createElement('div');
+                var data_element = document.createElement('data');
+                new_element.textContent = d.remarks.title;
+                new_element.style.width = width + "px"
+                new_element.style.marginLeft = 72 * 24 + "px";
+                new_element.className = "sjs-grid-overlay-col sjs-grid-overlay-col-clickable remarks";
+                data_element.value = d.remarks.payload;
+                new_element.appendChild(data_element);
+                sjs_overlay[i].append(new_element);
+            }
+        }
+    })
 });

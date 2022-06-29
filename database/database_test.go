@@ -4,6 +4,7 @@ import (
 	"lifelog/models"
 	"log"
 	"testing"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/suite"
@@ -25,13 +26,13 @@ func (suite *DataBaseTestSuite) SetupTest() {
 	db := DataBaseConnect()
 	suite.db = db
 	// DBのマイグレーション
-	suite.db.AutoMigrate(&models.User{}, &models.LifeLog{}, &models.Appointment{})
+	suite.db.AutoMigrate(&models.User{}, &models.LifeLog{}, &models.Appointment{}, &models.Remarks{})
 }
 
 // テスト終了時の処理
 func (suite *DataBaseTestSuite) TearDownTest() {
 	// DBのテーブルを削除
-	suite.db.Migrator().DropTable(&models.User{}, &models.LifeLog{}, &models.Appointment{})
+	suite.db.Migrator().DropTable(&models.User{}, &models.LifeLog{}, &models.Appointment{}, &models.Remarks{})
 	// DBから切断
 	db, _ := suite.db.DB()
 	db.Close()
@@ -91,6 +92,31 @@ func (suite *DataBaseTestSuite) TestCreate() {
 			Title:     &title,
 		}
 		err := suite.db.Create(&appointment).Error
+		if err != nil {
+			suite.Fail(err.Error())
+		}
+	})
+	suite.Run("Remarks Create", func() {
+		aud := "rmktestaud"
+		user := models.User{
+			Aud:  &aud,
+			Name: "rmktestname",
+		}
+		suite.db.Create(&user)
+		name := "rmktestname"
+		lifelog := models.LifeLog{
+			UserId: user.ID,
+			Name:   &name,
+		}
+		suite.db.Create(&lifelog)
+		title := "testtitle"
+		date := time.Now().Format("2006/01/02")
+		remarks := models.Remarks{
+			LifeLogId: lifelog.ID,
+			Title:     &title,
+			Date:      &date,
+		}
+		err := suite.db.Create(&remarks).Error
 		if err != nil {
 			suite.Fail(err.Error())
 		}

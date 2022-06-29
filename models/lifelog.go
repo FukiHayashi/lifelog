@@ -13,6 +13,7 @@ type LifeLog struct {
 	Name         *string        `json:"name" gorm:"not null"`
 	LoggedAt     time.Time      `json:"-" gorm:"index"`
 	Appointments []Appointment  `json:"appointments"`
+	Remarks      Remarks        `json:"remarks"`
 	CreatedAt    time.Time      `json:"-"`
 	UpdatedAt    time.Time      `json:"-"`
 	DeletedAt    gorm.DeletedAt `json:"-" gorm:"index"`
