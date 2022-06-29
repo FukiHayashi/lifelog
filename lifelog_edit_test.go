@@ -96,7 +96,6 @@ var _ = Describe("LifelogEdit", Ordered, func() {
 		)
 		base_path := "http://localhost:3000/lifelog/edit/"
 		BeforeEach(func() {
-			db := database.DataBaseConnect()
 			// user情報取得
 			db.Where("name = ?", os.Getenv("AUTH0_EMAIL")).First(&user)
 			// lifelog情報取得
