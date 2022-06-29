@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/joho/godotenv"
 
@@ -34,8 +35,8 @@ func main() {
 
 	rtr := router.New(auth)
 
-	log.Print("Server listening on http://localhost:3000/")
-	if err := http.ListenAndServe("0.0.0.0:3000", rtr); err != nil {
+	log.Print("Server listening on " + os.Getenv("SERVER_PATH"))
+	if err := http.ListenAndServe(os.Getenv("SERVER_ADDRESS"), rtr); err != nil {
 		log.Fatalf("HTTPサーバーの起動時にエラーが発生しました: %v", err)
 	}
 }
