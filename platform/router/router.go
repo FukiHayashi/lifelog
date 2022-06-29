@@ -2,7 +2,6 @@ package router
 
 import (
 	"encoding/gob"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
@@ -41,38 +40,40 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 	// コールバックハンドラ
 	router.GET("/callback", callback.Handler(auth))
 
-	auth_user_group := router.Group("/auth")
-	auth_user_group.Use(authRequired())
+	// ライフログ画面のハンドラ
+	auth_group := router.Group("/", authRequired())
 	{
-		// ライフログ画面のハンドラ
-		router.GET("/lifelog", lifelog.Handler)
-		router.GET("/lifelog/new", lifelog.NewHandler)
-		router.POST("/lifelog/create", lifelog.CreateHandler)
-		router.GET("/lifelog/:month", lifelog.MonthlyHandler)
-		router.GET("/lifelog/edit/:appointmentId", lifelog.EditHandler)
-		router.POST("/lifelog/update/:appointmentId", lifelog.UpdateHandler)
-		router.DELETE("/lifelog/delete/:appointmentId", lifelog.DeleteHandler)
-		router.GET("/remarks/new", remarks.NewHandler)
-		router.POST("/remarks/create", remarks.CreateHandler)
-		router.GET("/remarks/edit/:remarksId", remarks.EditHandler)
-		router.POST("/remarks/update/:remarksId", remarks.UpdateHandler)
-		router.DELETE("/remarks/delete/:remarksId", remarks.DeleteHandler)
-
-		router.GET("/logout", logout.Handler)
+		lifelog_group := auth_group.Group("/lifelog")
+		{
+			lifelog_group.GET("/", lifelog.Handler)
+			lifelog_group.GET("/new", lifelog.NewHandler)
+			lifelog_group.POST("/create", lifelog.CreateHandler)
+			lifelog_group.GET("/:month", lifelog.MonthlyHandler)
+			lifelog_group.GET("/edit/:appointmentId", lifelog.EditHandler)
+			lifelog_group.POST("/update/:appointmentId", lifelog.UpdateHandler)
+			lifelog_group.DELETE("/delete/:appointmentId", lifelog.DeleteHandler)
+		}
+		remarks_group := auth_group.Group("/remarks")
+		{
+			remarks_group.GET("/new", remarks.NewHandler)
+			remarks_group.POST("/create", remarks.CreateHandler)
+			remarks_group.GET("/edit/:remarksId", remarks.EditHandler)
+			remarks_group.POST("/update/:remarksId", remarks.UpdateHandler)
+			remarks_group.DELETE("/delete/:remarksId", remarks.DeleteHandler)
+		}
+		auth_group.DELETE("/logout", logout.Handler)
 	}
+
 	return router
 }
 
-// ここはうまく動きません
-// 未ログイン状態で/lifelogを見ようとした時にエラーが出る（トップページにリダイレクトしたい）
-// 調べても分からないので後回し
 func authRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
 		profile := session.Get("profile")
-		fmt.Println(profile)
 		if profile == nil {
-			c.Redirect(http.StatusMovedPermanently, "/")
+			// 未ログインの場合403を返す
+			c.Status(http.StatusForbidden)
 			c.Abort()
 		}
 		c.Next()
