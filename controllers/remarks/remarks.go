@@ -64,9 +64,23 @@ func createRemarks(ctx *gin.Context) error {
 
 	lifelog := models.LifeLog{}
 
+	t, _ := time.Parse("2006/01/02", ctx.PostForm("date"))
 	// 入力された日付のLifelogを取得
-	db.Where(&models.LifeLog{UserId: user.ID}).Where("name = ?", ctx.PostForm("date")).First(&lifelog)
-
+	if err := db.Where("name = ?", ctx.PostForm("date")).Where("user_id = ?", user.ID).First(&models.LifeLog{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		lifelogs := []models.LifeLog{}
+		name_date := time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.Local)
+		for name_date.Month() == t.Month() {
+			lifelog_name := name_date.Format("2006/01/02")
+			lifelogs = append(lifelogs, models.LifeLog{
+				UserId:   user.ID,
+				LoggedAt: name_date,
+				Name:     &lifelog_name,
+			})
+			name_date = name_date.AddDate(0, 0, 1)
+		}
+		db.Create(&lifelogs)
+	}
+	db.Where("name = ?", ctx.PostForm("date")).Where("user_id = ?", user.ID).First(&lifelog)
 	// 新規と追記の処理分け
 	remarks := models.Remarks{}
 	var error error
@@ -111,8 +125,23 @@ func UpdateHandler(ctx *gin.Context) {
 	db.Where("sub = ?", user.Sub).First(&user)
 
 	lifelog := models.LifeLog{}
+	t, _ := time.Parse("2006/01/02", ctx.PostForm("date"))
 	// 入力された日付のLifelogを取得
-	db.Where(&models.LifeLog{UserId: user.ID}).Where("name = ?", ctx.PostForm("date")).First(&lifelog)
+	if err := db.Where("name = ?", ctx.PostForm("date")).Where("user_id = ?", user.ID).First(&models.LifeLog{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		lifelogs := []models.LifeLog{}
+		name_date := time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.Local)
+		for name_date.Month() == t.Month() {
+			lifelog_name := name_date.Format("2006/01/02")
+			lifelogs = append(lifelogs, models.LifeLog{
+				UserId:   user.ID,
+				LoggedAt: name_date,
+				Name:     &lifelog_name,
+			})
+			name_date = name_date.AddDate(0, 0, 1)
+		}
+		db.Create(&lifelogs)
+	}
+	db.Where("name = ?", ctx.PostForm("date")).Where("user_id = ?", user.ID).First(&lifelog)
 	// 該当のremarksを取得
 	remarks := models.Remarks{}
 	db.Where("id = ?", ctx.Param("remarksId")).First(&remarks)
