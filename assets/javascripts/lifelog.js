@@ -42,12 +42,7 @@ $(document).ready(function(){
             for(var i = 0; i < list[index].appointments.length; i++){
                 var e = list[index].appointments[i]
                 if(e.payload == payload){
-                    var url = ""
-                    if(e.class == "remarks" && e.payload == payload){
-                        url = '/remarks/edit/' + payload;
-                    }else{
-                        url = '/lifelog/edit/' + payload;
-                    }
+                    var url = '/lifelog/edit/' + payload;
                     window.location.href = url;
                     break outerIndex;
                 }else{
@@ -88,25 +83,21 @@ function addRemarksCol(width){
     remarks_col.className = "sjs-grid-col";
     $('.sjs-grid-row').append(remarks_col);
 }
-$(document).ready(function(){
+
+function addRemarksOverlay(width){
     var data = JSON.parse($("#js_schedulerjs_list").val());
 //    var data = [{"name":"2022/06/01","remarks":{"title":"test","payload":"1"}}]
-    var sjs_name= $('.sjs-name')
+    var sjs_name= $('.sjs-name');
     var sjs_overlay = $('.sjs-grid-overlay-row');
-
-    const width = 90;
-    addRemarksHead(width);
-    addRemarksCol(width);
-   
     data.forEach(function(d){
         for( i=0; i<sjs_name.length; i++){
             if(d.remarks.date == sjs_name[i].textContent){
                 var new_element = document.createElement('div');
                 var data_element = document.createElement('data');
-                var childlen = sjs_overlay[i].getElementsByClassName("sjs-grid-overlay-col")
-                var margin = 72 * 24
+                var childlen = sjs_overlay[i].getElementsByClassName("sjs-grid-overlay-col");
+                var margin = 72 * 24;
                 for( j=0; j<childlen.length; j++){
-                    margin = margin - (parseInt(childlen[j].style.width) + parseInt(childlen[j].style.marginLeft))
+                    margin = margin - (parseInt(childlen[j].style.width) + parseInt(childlen[j].style.marginLeft));
                 }
                 new_element.textContent = d.remarks.title;
                 new_element.style.width = width + "px"
@@ -118,4 +109,17 @@ $(document).ready(function(){
             }
         }
     })
+}
+
+$(document).ready(function(){
+    const width = 90;
+    addRemarksHead(width);
+    addRemarksCol(width);
+    addRemarksOverlay(width);
+});
+
+$(document).ready(function(){
+    $('.remarks').click(function(){
+        window.location.href = '/remarks/edit/' + this.getElementsByTagName('data')[0].value;
+    });
 });
