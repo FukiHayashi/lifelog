@@ -103,9 +103,14 @@ $(document).ready(function(){
             if(d.remarks.date == sjs_name[i].textContent){
                 var new_element = document.createElement('div');
                 var data_element = document.createElement('data');
+                var childlen = sjs_overlay[i].getElementsByClassName("sjs-grid-overlay-col")
+                var margin = 72 * 24
+                for( j=0; j<childlen.length; j++){
+                    margin = margin - (parseInt(childlen[j].style.width) + parseInt(childlen[j].style.marginLeft))
+                }
                 new_element.textContent = d.remarks.title;
                 new_element.style.width = width + "px"
-                new_element.style.marginLeft = 72 * 24 + "px";
+                new_element.style.marginLeft = margin + "px";
                 new_element.className = "sjs-grid-overlay-col sjs-grid-overlay-col-clickable remarks";
                 data_element.value = d.remarks.payload;
                 new_element.appendChild(data_element);
