@@ -17,13 +17,13 @@ func (th *TestHelper) SetupTest() {
 	db := database.DataBaseConnect()
 	th.DB = db
 	// DBのマイグレーション
-	th.DB.AutoMigrate(&models.User{}, &models.LifeLog{}, &models.Appointment{})
+	th.DB.AutoMigrate(&models.User{}, &models.LifeLog{}, &models.Appointment{}, &models.Remarks{})
 }
 
 // テスト終了時の処理
 func (th *TestHelper) TearDownTest() {
 	// DBのテーブルを削除
-	th.DB.Migrator().DropTable(&models.User{}, &models.LifeLog{}, &models.Appointment{})
+	th.DB.Migrator().DropTable(&models.User{}, &models.LifeLog{}, &models.Appointment{}, &models.Remarks{})
 	// DBから切断
 	db, _ := th.DB.DB()
 	db.Close()
