@@ -46,9 +46,9 @@ func TestUserTestSuite(t *testing.T) {
 // Createのテスト
 func (suite *DataBaseTestSuite) TestCreate() {
 	suite.Run("User Create", func() {
-		aud := "testaud"
+		sub := "testaud"
 		user := models.User{
-			Aud:  &aud,
+			Sub:  &sub,
 			Name: "testname",
 		}
 		err := suite.db.Create(&user).Error
@@ -57,9 +57,9 @@ func (suite *DataBaseTestSuite) TestCreate() {
 		}
 	})
 	suite.Run("Lifelog Create", func() {
-		aud := "lifelogtestaud"
+		sub := "lifelogtestaud"
 		user := models.User{
-			Aud:  &aud,
+			Sub:  &sub,
 			Name: "lifelogtestname",
 		}
 		suite.db.Create(&user)
@@ -74,9 +74,9 @@ func (suite *DataBaseTestSuite) TestCreate() {
 		}
 	})
 	suite.Run("Appointment Create", func() {
-		aud := "apptestaud"
+		sub := "apptestaud"
 		user := models.User{
-			Aud:  &aud,
+			Sub:  &sub,
 			Name: "apptestname",
 		}
 		suite.db.Create(&user)
@@ -97,9 +97,9 @@ func (suite *DataBaseTestSuite) TestCreate() {
 		}
 	})
 	suite.Run("Remarks Create", func() {
-		aud := "rmktestaud"
+		sub := "rmktestaud"
 		user := models.User{
-			Aud:  &aud,
+			Sub:  &sub,
 			Name: "rmktestname",
 		}
 		suite.db.Create(&user)

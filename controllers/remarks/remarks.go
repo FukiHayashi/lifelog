@@ -48,7 +48,7 @@ func createRemarks(ctx *gin.Context) error {
 	// Connect to DB
 	db := database.DataBaseConnect()
 	// ユーザの取得
-	db.Where("aud = ?", user.Aud).First(&user)
+	db.Where("sub = ?", user.Sub).First(&user)
 
 	// 入力値を取得
 	input_remarks := models.Remarks{
@@ -108,7 +108,7 @@ func UpdateHandler(ctx *gin.Context) {
 	// Connect to DB
 	db := database.DataBaseConnect()
 	// ユーザの取得
-	db.Where("aud = ?", user.Aud).First(&user)
+	db.Where("sub = ?", user.Sub).First(&user)
 
 	lifelog := models.LifeLog{}
 	// 入力された日付のLifelogを取得
@@ -152,7 +152,7 @@ func deleteRemarks(ctx *gin.Context) {
 // profileからユーザ情報を取得する
 func getUserInfo(map_profile map[string]interface{}) models.User {
 	user := models.User{}
-	user.Aud = GetStringPointer(map_profile["aud"].(string))
+	user.Sub = GetStringPointer(map_profile["sub"].(string))
 	user.Name = map_profile["name"].(string)
 	return user
 }

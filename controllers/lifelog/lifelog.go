@@ -24,13 +24,13 @@ func Handler(ctx *gin.Context) {
 
 	user := models.User{}
 	// 初めてログインする場合、ユーザを作成
-	if err := db.Where("aud = ?", map_profile["aud"].(string)).First(&user).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+	if err := db.Where("sub = ?", map_profile["sub"].(string)).First(&user).Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		user = getUserInfo(map_profile)
 		db.Create(&user)
 	}
 	// 月のデータが無い場合、その月のカレンダーを作成
 	now := time.Now()
-	if err := db.Where("name = ?", now.Format("2006/01/02")).First(&models.LifeLog{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+	if err := db.Where("name = ?", now.Format("2006/01/02")).Where("user_id", user.ID).First(&models.LifeLog{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		lifelogs := []models.LifeLog{}
 		name_date := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, time.Local)
 		for name_date.Month() == now.Month() {
@@ -74,7 +74,7 @@ func MonthlyHandler(ctx *gin.Context) {
 	map_profile := profile.(map[string]interface{})
 	user := models.User{}
 	// ユーザ情報を取得
-	db.Where("aud = ?", map_profile["aud"].(string)).First(&user)
+	db.Where("sub = ?", map_profile["sub"].(string)).First(&user)
 
 	// 表示するデータを取得
 	lifelogs := []models.LifeLog{}
@@ -194,7 +194,7 @@ func createLifelog(ctx *gin.Context) error {
 	// Connect to DB
 	db := database.DataBaseConnect()
 	// ユーザの取得
-	db.Where("aud = ?", user.Aud).First(&user)
+	db.Where("sub = ?", user.Sub).First(&user)
 
 	// フォーム情報を取得
 	appointment := models.Appointment{
@@ -215,7 +215,7 @@ func createLifelog(ctx *gin.Context) error {
 
 	// 月のデータが無い場合、その月のカレンダーを作成
 	for _, t := range []time.Time{start_time, end_time} {
-		if err := db.Where("name = ?", t.Format("2006/01/02")).First(&models.LifeLog{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		if err := db.Where("name = ?", t.Format("2006/01/02")).Where("user_id", user.ID).First(&models.LifeLog{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
 			lifelogs := []models.LifeLog{}
 			name_date := time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.Local)
 			for name_date.Month() == t.Month() {
@@ -264,9 +264,9 @@ func createLifelog(ctx *gin.Context) error {
 }
 
 func getUserInfo(map_profile map[string]interface{}) models.User {
-	aud := map_profile["aud"].(string)
+	sub := map_profile["sub"].(string)
 	user := models.User{
-		Aud:  &aud,
+		Sub:  &sub,
 		Name: map_profile["name"].(string),
 	}
 	return user

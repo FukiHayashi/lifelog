@@ -9,7 +9,7 @@ import (
 
 type User struct {
 	ID        uuid.UUID      `json:"id" gorm:"primaryKey;type:uuid;default:uuid_generate_v4()"`
-	Aud       *string        `json:"-" gorm:"index;unique;not null"`
+	Sub       *string        `json:"-" gorm:"index;unique;not null"`
 	Name      string         `json:"name"`
 	Lifelogs  []LifeLog      `json:"lifelog"`
 	CreatedAt time.Time      `json:"-"`
