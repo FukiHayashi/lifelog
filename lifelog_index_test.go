@@ -2,6 +2,7 @@ package main_test
 
 import (
 	"lifelog/database"
+	"lifelog/helpers"
 	"lifelog/models"
 	"net/http"
 	"os"
@@ -21,11 +22,11 @@ var _ = Describe("LifelogIndex", Ordered, func() {
 	BeforeAll(func() {
 		db = database.DataBaseConnect()
 		// DBのマイグレーション
-		db.AutoMigrate(&models.User{}, &models.LifeLog{}, &models.Appointment{})
+		db.AutoMigrate(&models.User{}, &models.LifeLog{}, &models.Appointment{}, &models.Remarks{})
 	})
 	AfterAll(func() {
 		// テストに使用したDBの内容を全て削除する
-		db.Migrator().DropTable(&models.User{}, &models.LifeLog{}, &models.Appointment{})
+		db.Migrator().DropTable(&models.User{}, &models.LifeLog{}, &models.Appointment{}, &models.Remarks{})
 		dbc, _ := db.DB()
 		dbc.Close()
 	})
@@ -92,6 +93,72 @@ var _ = Describe("LifelogIndex", Ordered, func() {
 			It("ログアウトし、ホーム画面に遷移すること", func() {
 				page.FindByID("logout").Click()
 				Expect(page).To(HaveTitle("Lifelog | ホーム"))
+			})
+		})
+		Context("appointmentを押した時", func() {
+			It("行動記録編集画面が表示されること", func() {
+				user := models.User{}
+				lifelog := models.LifeLog{}
+				// user情報取得
+				db.Where("name = ?", os.Getenv("AUTH0_EMAIL")).First(&user)
+				// lifelog情報取得
+				db.Where(&models.LifeLog{UserId: user.ID}).Where("name = ?", time.Now().Format("2006/01/02")).First(&lifelog)
+				appointment := models.Appointment{
+					LifeLogId: lifelog.ID,
+					Title:     helpers.GetStringPointer("appointment"),
+					Class:     "sleep",
+				}
+				db.Save(&appointment)
+				Expect(page.Navigate(os.Getenv("SERVER_PATH") + "/lifelog")).To(Succeed())
+				Expect(page.FindByClass("sleep").Click()).To(Succeed())
+				page.FindByClass("sleep").Click()
+				Expect(page.URL()).To(Equal(os.Getenv("SERVER_PATH") + "/lifelog/edit/" + appointment.ID.String()))
+			})
+		})
+		Context("remarksを押した時", func() {
+			It("備考編集画面が表示されること", func() {
+				user := models.User{}
+				lifelog := models.LifeLog{}
+				// user情報取得
+				db.Where("name = ?", os.Getenv("AUTH0_EMAIL")).First(&user)
+				// lifelog情報取得
+				db.Where(&models.LifeLog{UserId: user.ID}).Where("name = ?", time.Now().Format("2006/01/02")).First(&lifelog)
+				remarks := models.Remarks{
+					LifeLogId: lifelog.ID,
+					Title:     helpers.GetStringPointer("remarks"),
+					Date:      lifelog.Name,
+					Class:     "remarks",
+				}
+				db.Save(&remarks)
+				Expect(page.Navigate(os.Getenv("SERVER_PATH") + "/lifelog")).To(Succeed())
+				Expect(page.FindByClass("remarks").Click()).To(Succeed())
+				page.FindByClass("remarks").Click()
+				Expect(page.URL()).To(Equal(os.Getenv("SERVER_PATH") + "/remarks/edit/" + remarks.ID.String()))
+			})
+		})
+		Context("月を切り替えた時", func() {
+			It("選択した月のlifelogが表示されること", func() {
+				user := models.User{}
+				// user情報取得
+				db.Where("name = ?", os.Getenv("AUTH0_EMAIL")).First(&user)
+				// 次の月のlifelogを作成
+				lifelogs := []models.LifeLog{}
+				t := time.Now().AddDate(0, 1, 0)
+				name_date := time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.Local)
+				for name_date.Month() == t.Month() {
+					lifelog_name := name_date.Format("2006/01/02")
+					lifelogs = append(lifelogs, models.LifeLog{
+						UserId:   user.ID,
+						LoggedAt: name_date,
+						Name:     &lifelog_name,
+					})
+					name_date = name_date.AddDate(0, 0, 1)
+				}
+				db.Create(&lifelogs)
+				// ページ更新
+				Expect(page.Navigate(os.Getenv("SERVER_PATH") + "/lifelog")).To(Succeed())
+				Expect(page.FindByID("js_monthly_selector").Select(t.Format("2006-01"))).To(Succeed())
+				Expect(page.URL()).To(Equal(os.Getenv("SERVER_PATH") + "/lifelog/" + t.Format("2006-01")))
 			})
 		})
 	})
