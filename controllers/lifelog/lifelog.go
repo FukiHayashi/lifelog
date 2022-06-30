@@ -83,7 +83,7 @@ func MonthlyHandler(ctx *gin.Context) {
 
 	// DBに存在する月データを取得する
 	var monthes []string
-	db.Model(&models.LifeLog{}).Where("name like ?", "%/01").Order("name").Pluck("name", &monthes)
+	db.Model(&models.LifeLog{}).Where("name like ?", "%/01").Where("user_id = ?", user.ID).Order("name").Pluck("name", &monthes)
 	for i, m := range monthes {
 		t, _ := time.Parse("2006/01/02", m)
 		monthes[i] = t.Format("2006-01")
@@ -215,7 +215,7 @@ func createLifelog(ctx *gin.Context) error {
 
 	// 月のデータが無い場合、その月のカレンダーを作成
 	for _, t := range []time.Time{start_time, end_time} {
-		if err := db.Where("name = ?", t.Format("2006/01/02")).Where("user_id", user.ID).First(&models.LifeLog{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		if err := db.Where("name = ?", t.Format("2006/01/02")).Where("user_id = ?", user.ID).First(&models.LifeLog{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
 			lifelogs := []models.LifeLog{}
 			name_date := time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.Local)
 			for name_date.Month() == t.Month() {
