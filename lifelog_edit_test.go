@@ -200,7 +200,54 @@ var _ = Describe("LifelogEdit", Ordered, func() {
 					Expect(page.FindByName("class").Attribute("value")).To(Equal("meal"))
 				})
 			})
+			Context("別ユーザの行動記録を編集しようとした時", Ordered, func() {
+				var (
+					other_appointment models.Appointment
+					other_lifelog     models.LifeLog
+					other_user        models.User
+				)
+				BeforeAll(func() {
+					// user情報作成
+					other_user = models.User{
+						Sub:  helpers.GetStringPointer("other_user"),
+						Name: "other_user",
+					}
+					db.Create(&other_user)
 
+					// 月のlifelogを作成
+					lifelogs := []models.LifeLog{}
+					t := time.Now()
+					name_date := time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.Local)
+					for name_date.Month() == t.Month() {
+						lifelog_name := name_date.Format("2006/01/02")
+						lifelogs = append(lifelogs, models.LifeLog{
+							UserId:   other_user.ID,
+							LoggedAt: name_date,
+							Name:     &lifelog_name,
+						})
+						name_date = name_date.AddDate(0, 0, 1)
+					}
+					db.Create(&lifelogs)
+				})
+				BeforeEach(func() {
+					// lifelog情報取得
+					db.Where(&models.LifeLog{UserId: other_user.ID}).Where("name = ?", time.Now().Format("2006/01/02")).First(&other_lifelog)
+					// appointment情報書き込み
+					other_appointment = models.Appointment{
+						LifeLogId: other_lifelog.ID,
+						Title:     helpers.GetStringPointer("other_appointment"),
+					}
+					db.Save(&other_appointment)
+				})
+				AfterEach(func() {
+					// 使用したappointmentを削除
+					db.Delete(&other_appointment)
+				})
+				It("閲覧できないこと", func() {
+					Expect(page.Navigate(os.Getenv("SERVER_PATH") + "/lifelog/edit/" + other_appointment.ID.String())).To(Succeed())
+					Expect(page.FindByName("title")).ToNot(BeFound())
+				})
+			})
 		})
 		Describe("キャンセルボタン", func() {
 			var (

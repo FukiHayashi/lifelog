@@ -130,38 +130,17 @@ func CreateHandler(ctx *gin.Context) {
 func EditHandler(ctx *gin.Context) {
 	session := sessions.Default(ctx)
 	profile := session.Get("profile")
-
+	user := getUserInfo(profile.(map[string]interface{}))
 	db := database.DataBaseConnect()
-
+	// ユーザの取得
+	db.Where("sub = ?", user.Sub).First(&user)
 	appointment := models.Appointment{}
 	lifelog := models.LifeLog{}
 	db.Where("id = ?", ctx.Param("appointmentId")).First(&appointment)
-	db.Where("id = ?", appointment.LifeLogId).First(&lifelog)
-	ctx.HTML(http.StatusOK, "lifelog_edit.html", gin.H{
-		"profile":             profile,
-		"lifelog_update_path": "/lifelog/update/" + ctx.Param("appointmentId"),
-		"lifelog_delete_path": "/lifelog/delete/" + ctx.Param("appointmentId"),
-		"title":               appointment.Title,
-		"start":               *lifelog.Name + " " + *appointment.Start,
-		"end":                 *lifelog.Name + " " + *appointment.End,
-		"class":               appointment.Class,
-	})
-}
-
-func UpdateHandler(ctx *gin.Context) {
-	session := sessions.Default(ctx)
-	profile := session.Get("profile")
-	db := database.DataBaseConnect()
-
-	appointment := models.Appointment{}
-	lifelog := models.LifeLog{}
-	db.Where("id = ?", ctx.Param("appointmentId")).First(&appointment)
-	db.Where("id = ?", appointment.LifeLogId).First(&lifelog)
-
-	if createLifelog(ctx) != nil {
-		ctx.HTML(http.StatusBadRequest, "lifelog_edit.html", gin.H{
-			"msg":                 "未入力の項目があります",
-			"status":              "error",
+	if err := db.Where("user_id = ?", user.ID).Where("id = ?", appointment.LifeLogId).First(&lifelog).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		ctx.Status(http.StatusNotFound)
+	} else {
+		ctx.HTML(http.StatusOK, "lifelog_edit.html", gin.H{
 			"profile":             profile,
 			"lifelog_update_path": "/lifelog/update/" + ctx.Param("appointmentId"),
 			"lifelog_delete_path": "/lifelog/delete/" + ctx.Param("appointmentId"),
@@ -170,9 +149,38 @@ func UpdateHandler(ctx *gin.Context) {
 			"end":                 *lifelog.Name + " " + *appointment.End,
 			"class":               appointment.Class,
 		})
+	}
+}
+
+func UpdateHandler(ctx *gin.Context) {
+	session := sessions.Default(ctx)
+	profile := session.Get("profile")
+	user := getUserInfo(profile.(map[string]interface{}))
+	db := database.DataBaseConnect()
+	// ユーザの取得
+	db.Where("sub = ?", user.Sub).First(&user)
+	appointment := models.Appointment{}
+	lifelog := models.LifeLog{}
+	db.Where("id = ?", ctx.Param("appointmentId")).First(&appointment)
+	if err := db.Where("user_id = ?", user.ID).Where("id = ?", appointment.LifeLogId).First(&lifelog).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		ctx.Status(http.StatusNotFound)
 	} else {
-		deleteLifelog(ctx)
-		ctx.Redirect(http.StatusMovedPermanently, "/lifelog")
+		if createLifelog(ctx) != nil {
+			ctx.HTML(http.StatusBadRequest, "lifelog_edit.html", gin.H{
+				"msg":                 "未入力の項目があります",
+				"status":              "error",
+				"profile":             profile,
+				"lifelog_update_path": "/lifelog/update/" + ctx.Param("appointmentId"),
+				"lifelog_delete_path": "/lifelog/delete/" + ctx.Param("appointmentId"),
+				"title":               appointment.Title,
+				"start":               *lifelog.Name + " " + *appointment.Start,
+				"end":                 *lifelog.Name + " " + *appointment.End,
+				"class":               appointment.Class,
+			})
+		} else {
+			deleteLifelog(ctx)
+			ctx.Redirect(http.StatusMovedPermanently, "/lifelog")
+		}
 	}
 }
 
