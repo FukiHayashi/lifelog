@@ -159,6 +159,55 @@ var _ = Describe("RemarksEdit", Ordered, func() {
 					Expect(page.FindByID("msg-error")).To(HaveText("未入力の項目があります"))
 				})
 			})
+			Context("別ユーザの備考を編集しようとした時", Ordered, func() {
+				var (
+					other_remarks models.Remarks
+					other_lifelog models.LifeLog
+					other_user    models.User
+				)
+				BeforeAll(func() {
+					// user情報作成
+					other_user = models.User{
+						Sub:  helpers.GetStringPointer("other_user"),
+						Name: "other_user",
+					}
+					db.Create(&other_user)
+
+					// 月のlifelogを作成
+					lifelogs := []models.LifeLog{}
+					t := time.Now()
+					name_date := time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.Local)
+					for name_date.Month() == t.Month() {
+						lifelog_name := name_date.Format("2006/01/02")
+						lifelogs = append(lifelogs, models.LifeLog{
+							UserId:   other_user.ID,
+							LoggedAt: name_date,
+							Name:     &lifelog_name,
+						})
+						name_date = name_date.AddDate(0, 0, 1)
+					}
+					db.Create(&lifelogs)
+				})
+				BeforeEach(func() {
+					// lifelog情報取得
+					db.Where(&models.LifeLog{UserId: other_user.ID}).Where("name = ?", time.Now().Format("2006/01/02")).First(&other_lifelog)
+					// appointment情報書き込み
+					other_remarks = models.Remarks{
+						LifeLogId: other_lifelog.ID,
+						Title:     helpers.GetStringPointer("other_appointment"),
+						Date:      other_lifelog.Name,
+					}
+					db.Save(&other_remarks)
+				})
+				AfterEach(func() {
+					// 使用したappointmentを削除
+					db.Delete(&other_remarks)
+				})
+				It("閲覧できないこと", func() {
+					Expect(page.Navigate(os.Getenv("SERVER_PATH") + "/remarks/edit/" + other_remarks.ID.String())).To(Succeed())
+					Expect(page.FindByName("title")).ToNot(BeFound())
+				})
+			})
 		})
 		Describe("キャンセルボタン", func() {
 			var (

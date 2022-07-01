@@ -99,20 +99,26 @@ func createRemarks(ctx *gin.Context) error {
 func EditHandler(ctx *gin.Context) {
 	session := sessions.Default(ctx)
 	profile := session.Get("profile")
+	user := getUserInfo(profile.(map[string]interface{}))
 
 	db := database.DataBaseConnect()
+	// ユーザの取得
+	db.Where("sub = ?", user.Sub).First(&user)
 
 	remarks := models.Remarks{}
 	lifelog := models.LifeLog{}
 	db.Where("id = ?", ctx.Param("remarksId")).First(&remarks)
-	db.Where("id = ?", remarks.LifeLogId).First(&lifelog)
-	ctx.HTML(http.StatusOK, "remarks_edit.html", gin.H{
-		"profile":             profile,
-		"remarks_update_path": "/remarks/update/" + ctx.Param("remarksId"),
-		"remarks_delete_path": "/remarks/delete/" + ctx.Param("remarksId"),
-		"title":               *remarks.Title,
-		"date":                *remarks.Date,
-	})
+	if err := db.Where("user_id = ?", user.ID).Where("id = ?", remarks.LifeLogId).First(&lifelog).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		ctx.Status(http.StatusNotFound)
+	} else {
+		ctx.HTML(http.StatusOK, "remarks_edit.html", gin.H{
+			"profile":             profile,
+			"remarks_update_path": "/remarks/update/" + ctx.Param("remarksId"),
+			"remarks_delete_path": "/remarks/delete/" + ctx.Param("remarksId"),
+			"title":               *remarks.Title,
+			"date":                *remarks.Date,
+		})
+	}
 }
 
 func UpdateHandler(ctx *gin.Context) {
@@ -141,13 +147,12 @@ func UpdateHandler(ctx *gin.Context) {
 		}
 		db.Create(&lifelogs)
 	}
-	db.Where("name = ?", ctx.PostForm("date")).Where("user_id = ?", user.ID).First(&lifelog)
+
+	err := db.Where("name = ?", ctx.PostForm("date")).Where("user_id = ?", user.ID).First(&lifelog).Error
 	// 該当のremarksを取得
 	remarks := models.Remarks{}
 	db.Where("id = ?", ctx.Param("remarksId")).First(&remarks)
-
 	// 値を更新
-
 	if ctx.PostForm("title") == "" || ctx.PostForm("date") == "" {
 		ctx.HTML(http.StatusBadRequest, "remarks_edit.html", gin.H{
 			"msg":                 "未入力の項目があります",
@@ -158,6 +163,8 @@ func UpdateHandler(ctx *gin.Context) {
 			"title":               *remarks.Title,
 			"date":                *remarks.Date,
 		})
+	} else if err != nil {
+		ctx.Status(http.StatusNotFound)
 	} else {
 		remarks.Title = GetStringPointer(ctx.PostForm("title"))
 		remarks.LifeLogId = lifelog.ID
