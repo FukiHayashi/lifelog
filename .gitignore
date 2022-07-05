@@ -1,9 +1,6 @@
 # Use in Project
 .env
 .testenv
-go.sum
-/rgb_go_selenium/bin
-/rgb_go_selenium/log
 .vscode
 /vendor
 /bin
