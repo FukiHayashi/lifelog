@@ -28,9 +28,9 @@ func main() {
 		log.Fatalf("認証器の生成に失敗しました: %v", err)
 	}
 
-	port := os.Getenv("SERVER_PORT")
+	port := os.Getenv("PORT")
 	if port == "" {
-		log.Fatal("$SERVER_PORT must be set")
+		log.Fatal("$PORT must be set")
 	}
 
 	// Connect to DB
@@ -42,7 +42,7 @@ func main() {
 
 	rtr := router.New(auth)
 
-	log.Print("Server listening on " + os.Getenv("SERVER_PORT"))
+	log.Print("Server listening on " + os.Getenv("PORT"))
 
 	rtr.Run(":" + port)
 }
