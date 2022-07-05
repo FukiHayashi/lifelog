@@ -17,7 +17,7 @@ import (
 func main() {
 	f := flag.String("env", ".env", "Set .env file path")
 	flag.Parse()
-	if f != nil {
+	if *f != "" {
 		if err := godotenv.Load(*f); err != nil {
 			log.Fatalf(".envファイルの読み込みに失敗しました: %v", err)
 		}
