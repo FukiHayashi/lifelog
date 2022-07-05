@@ -5,19 +5,22 @@ import (
 	"log"
 	"os"
 
-	"github.com/joho/godotenv"
-
 	"lifelog/database"
 	"lifelog/models"
 	"lifelog/platform/authenticator"
 	"lifelog/platform/router"
+
+	_ "github.com/heroku/x/hmetrics/onload"
+	"github.com/joho/godotenv"
 )
 
 func main() {
 	f := flag.String("env", ".env", "Set .env file path")
 	flag.Parse()
-	if err := godotenv.Load(*f); err != nil {
-		log.Fatalf(".envファイルの読み込みに失敗しました: %v", err)
+	if f != nil {
+		if err := godotenv.Load(*f); err != nil {
+			log.Fatalf(".envファイルの読み込みに失敗しました: %v", err)
+		}
 	}
 
 	auth, err := authenticator.New()
