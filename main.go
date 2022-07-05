@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -26,6 +25,11 @@ func main() {
 		log.Fatalf("認証器の生成に失敗しました: %v", err)
 	}
 
+	port := os.Getenv("SERVER_PORT")
+	if port == "" {
+		log.Fatal("$SERVER_PORT must be set")
+	}
+
 	// Connect to DB
 	db := database.DataBaseConnect()
 	// Migrate the schema
@@ -35,8 +39,7 @@ func main() {
 
 	rtr := router.New(auth)
 
-	log.Print("Server listening on " + os.Getenv("SERVER_PATH"))
-	if err := http.ListenAndServe(os.Getenv("SERVER_ADDRESS"), rtr); err != nil {
-		log.Fatalf("HTTPサーバーの起動時にエラーが発生しました: %v", err)
-	}
+	log.Print("Server listening on " + os.Getenv("SERVER_PORT"))
+
+	rtr.Run(":" + port)
 }

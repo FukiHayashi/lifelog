@@ -1,10 +1,11 @@
 package database
 
 import (
-	"fmt"
+	"database/sql"
+	"log"
 
+	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
-
 	"gorm.io/gorm"
 
 	"os"
@@ -12,11 +13,11 @@ import (
 
 func DataBaseConnect() *gorm.DB {
 	// Connect to Database
-	dsn := fmt.Sprintf("host=%s dbname=%s port=%s sslmode=%s",
-		os.Getenv("DB_HOST"), os.Getenv("DB_NAME"),
-		os.Getenv("DB_PORT"), os.Getenv("DB_SSLMODE"))
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-
+	sqlDB, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
+	if err != nil {
+		log.Fatalf("Error opening database: %q", err)
+	}
+	db, err := gorm.Open(postgres.New(postgres.Config{Conn: sqlDB}), &gorm.Config{})
 	if err != nil {
 		panic(err.Error())
 	}
