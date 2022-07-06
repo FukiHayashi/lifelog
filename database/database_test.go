@@ -20,7 +20,7 @@ type DataBaseTestSuite struct {
 // テスト開始時の処理
 func (suite *DataBaseTestSuite) SetupTest() {
 	if err := godotenv.Load("../.testenv"); err != nil {
-		log.Fatalf(".envファイルの読み込みに失敗しました: %v", err)
+		log.Fatalf("テスト用.envファイルの読み込みに失敗しました: %v", err)
 	}
 	// テスト環境のDBに接続
 	db := DataBaseConnect()
