@@ -20,13 +20,13 @@ var _ = Describe("RemarksNew", Ordered, func() {
 		db := database.DataBaseConnect()
 		// DBのマイグレーション
 		db.AutoMigrate(&models.User{}, &models.LifeLog{}, &models.Appointment{}, &models.Remarks{})
+		defer database.DataBaseClose(db)
 	})
 	AfterAll(func() {
 		// テストに使用したDBの内容を全て削除する
 		db := database.DataBaseConnect()
 		db.Migrator().DropTable(&models.User{}, &models.LifeLog{}, &models.Appointment{}, &models.Remarks{})
-		dbc, _ := db.DB()
-		dbc.Close()
+		defer database.DataBaseClose(db)
 	})
 
 	Describe("未ログイン時", func() {

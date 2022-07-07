@@ -27,8 +27,7 @@ var _ = Describe("RemarksEdit", Ordered, func() {
 	AfterAll(func() {
 		// テストに使用したDBの内容を全て削除する
 		db.Migrator().DropTable(&models.User{}, &models.LifeLog{}, &models.Appointment{}, &models.Remarks{})
-		dbc, _ := db.DB()
-		dbc.Close()
+		database.DataBaseClose(db)
 	})
 	BeforeEach(func() {
 		var err error
