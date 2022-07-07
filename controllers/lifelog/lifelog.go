@@ -64,6 +64,8 @@ func Handler(ctx *gin.Context) {
 		"this_month":       now.Format("2006-01"),
 		"schedulerjs_list": string(schedulerjs_list),
 	})
+
+	defer database.DataBaseClose(db)
 }
 
 func MonthlyHandler(ctx *gin.Context) {
@@ -95,6 +97,8 @@ func MonthlyHandler(ctx *gin.Context) {
 		"this_month":       ctx.Param("month"),
 		"schedulerjs_list": string(schedulerjs_list),
 	})
+
+	defer database.DataBaseClose(db)
 }
 
 func NewHandler(ctx *gin.Context) {
@@ -150,6 +154,8 @@ func EditHandler(ctx *gin.Context) {
 			"class":               appointment.Class,
 		})
 	}
+
+	defer database.DataBaseClose(db)
 }
 
 func UpdateHandler(ctx *gin.Context) {
@@ -182,6 +188,8 @@ func UpdateHandler(ctx *gin.Context) {
 			ctx.Redirect(http.StatusMovedPermanently, "/lifelog")
 		}
 	}
+
+	defer database.DataBaseClose(db)
 }
 
 func DeleteHandler(ctx *gin.Context) {
@@ -193,6 +201,8 @@ func deleteLifelog(ctx *gin.Context) {
 	appointment := models.Appointment{}
 	db.Where("id = ?", ctx.Param("appointmentId")).First(&appointment)
 	db.Delete(&appointment)
+
+	defer database.DataBaseClose(db)
 }
 
 func createLifelog(ctx *gin.Context) error {
@@ -268,6 +278,9 @@ func createLifelog(ctx *gin.Context) error {
 			break
 		}
 	}
+
+	defer database.DataBaseClose(db)
+
 	return db.Save(&lifelogs).Error
 }
 

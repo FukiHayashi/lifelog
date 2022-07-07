@@ -37,8 +37,8 @@ func main() {
 	db := database.DataBaseConnect()
 	// Migrate the schema
 	db.AutoMigrate(&models.User{}, &models.LifeLog{}, &models.Appointment{}, &models.Remarks{})
-	dbc, _ := db.DB()
-	defer dbc.Close()
+
+	defer database.DataBaseClose(db)
 
 	rtr := router.New(auth)
 

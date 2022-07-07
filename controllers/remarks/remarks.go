@@ -93,6 +93,9 @@ func createRemarks(ctx *gin.Context) error {
 		remarks.Title = GetStringPointer(*remarks.Title + "," + *input_remarks.Title)
 		error = db.Save(&remarks).Error
 	}
+
+	defer database.DataBaseClose(db)
+
 	return error
 }
 
@@ -119,6 +122,8 @@ func EditHandler(ctx *gin.Context) {
 			"date":                *remarks.Date,
 		})
 	}
+
+	defer database.DataBaseClose(db)
 }
 
 func UpdateHandler(ctx *gin.Context) {
@@ -172,6 +177,8 @@ func UpdateHandler(ctx *gin.Context) {
 		db.Save(&remarks)
 		ctx.Redirect(http.StatusMovedPermanently, "/lifelog")
 	}
+
+	defer database.DataBaseClose(db)
 }
 
 func DeleteHandler(ctx *gin.Context) {
@@ -183,6 +190,8 @@ func deleteRemarks(ctx *gin.Context) {
 	remarks := models.Remarks{}
 	db.Where("id = ?", ctx.Param("remarksId")).First(&remarks)
 	db.Delete(&remarks)
+
+	defer database.DataBaseClose(db)
 }
 
 // profileからユーザ情報を取得する
