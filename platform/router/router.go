@@ -20,6 +20,7 @@ import (
 // New はroutesを登録し、ルーターを返す
 func New(auth *authenticator.Authenticator) *gin.Engine {
 	router := gin.Default()
+	router.SetTrustedProxies(nil)
 
 	// セッション初期設定
 	gob.Register(map[string]interface{}{})
