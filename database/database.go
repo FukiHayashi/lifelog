@@ -21,7 +21,6 @@ func DataBaseConnect() *gorm.DB {
 	if err != nil {
 		panic(err.Error())
 	}
-	defer sqlDB.Close()
 	return db
 }
 
