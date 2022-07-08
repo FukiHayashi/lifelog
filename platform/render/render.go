@@ -18,7 +18,7 @@ func CreateRenderTemplates() multitemplate.Render {
 	}
 	for _, html := range htmls {
 		slice := strings.Split(html, "/")
-		r.AddFromFiles(slice[len(slice)-1], "./views/layout.tmpl", "./views/_header.tmpl", "./views/_footer.tmpl", "./views/_messages.tmpl", html)
+		r.AddFromFiles(slice[len(slice)-1], "./views/layout.tmpl", "./views/_header.tmpl", "./views/_footer.tmpl", "./views/_messages.tmpl", "./views/privacy_policy.tmpl", "./views/terms_of_service.tmpl", html)
 	}
 	return r
 }
