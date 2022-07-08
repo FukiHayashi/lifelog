@@ -32,7 +32,7 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 
 	router.Static("./assets", "./assets")
 
-	// 無名ハンドラ
+	// homeハンドラ
 	router.GET("/", func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "home.html", nil)
 	})

@@ -4,11 +4,19 @@
 {{define "content"}}
     <link rel="stylesheet" href="/assets/stylesheets/home.css">
     <div class="container">
-    <div class="dflex align-items-center row">
-        <div class="d-grid gap-2 col-8 mx-auto">
-            <div class="d-flex justify-content-center">このアプリケーションは自身の生活記録を行うために作成しました</div>
-            <a href="/login" class="btn btn-primary" role="button" id="signin">サインイン</a>
+        <div class="dflex align-items-center row">
+            <div  class="d-grid gap-3 col-8 mx-auto">
+                <h2>このアプリケーションについて</h2>
+                <p>
+                    復職するにあたり、日々の生活記録を取る必要がありました。 手書き、Excelなど取る方法は何でもOKでしたが、提出するフォーマットに落とし込むことが手間でした。
+                    本アプリではこの手間をなくし、生活記録を入力するだけで下図の様に可視化が行えます。
+                </p>
+                <img src="/assets/images/screen_image.png" width="848"/>
+                <h2>認証について</h2>
+                <p>本アプリの認証には外部サイトのAuth0を使用しています。</p>
+                <h2>利用を開始</h2>
+                <a href="/login" class="btn btn-primary" role="button" id="signin">サインイン</a>
+            </div>
         </div>
-    </div>
     </div>
 {{end}}
