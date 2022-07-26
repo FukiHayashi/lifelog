@@ -2,9 +2,7 @@
     min-height: 90vh;
     min-width: 90vh;
 }
-.sjs-grid-row {
-    border-bottom: 1px solid rgb(189, 189, 189);
-}
-.sjs-name {
+
+.sjs-grid-row,.sjs-name,.remarks {
     border-bottom: 1px solid rgb(189, 189, 189);
 }
